@@ -105,7 +105,7 @@
                                 Send Message
                             </button>
                         </div>
-                        <input type="hidden" name="_next" value="https://hakimilolw.github.io/WebLFSB/contact-us.html">
+                        <input type="hidden" name="_next" value="https://hakimilolw.github.io/WebLFSB/contact-us.html?submitted=true">
                         <input type="hidden" name="_captcha" value="false">
                     </form>
                     
@@ -132,7 +132,7 @@
                      <h2 class="text-3xl font-bold text-gray-800 mb-6">Find Us Here</h2>
                      <div class="w-full h-full min-h-[500px] rounded-lg overflow-hidden shadow-lg">
                         <iframe
-                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3977.9551737736424!2d114.01313497481578!3d4.419454695554749!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x321f4f0070a2dc0f%3A0xb815e08045f1ae7b!2sLegasi%20Futura%20Sdn.%20Bhd.!5e0!3m2!1sen!2smy!4v1750039681282!5m2!1sen!2smy"
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3977.9551737736424!2d114.01313497481578!3d4.419454695554749!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x321f4f0070a2dc0f%3A0xb815e08045f1ae7b!2sLegasi%20Futura%20Sdn.%20Bhd.!5e0!3m2!1sen!2smy!4v1750042046010!5m2!1sen!2smy"
                             class="w-full h-full border-0"
                             allowfullscreen=""
                             loading="lazy"
@@ -166,7 +166,7 @@
         </footer>
 
     <div class="text-center text-white text-sm py-6 bg-black">
-        &copy; 2025 Legasi Futura Sdn. Bhd. All rights reserved.
+        © 2025 Legasi Futura Sdn. Bhd. All rights reserved.
     </div>
     
     <a href="https://wa.me/60138626042" class="float" target="_blank">
@@ -176,27 +176,41 @@
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
     </a>
 
+    <div id="thank-you-modal" class="hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[100] p-4">
+        <div class="bg-white p-8 rounded-lg shadow-xl text-center max-w-sm mx-auto">
+            <h2 class="text-2xl font-bold mb-4 text-gray-800">Thank You!</h2>
+            <p class="text-gray-600 mb-6">Your message has been sent successfully. We will get back to you shortly.</p>
+            <button id="close-modal-btn" class="bg-blue-900 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors duration-300">Close</button>
+        </div>
+    </div>
+
+
     <script>
         const burgerMenuBtn = document.getElementById('burger-menu');
         const mobileMenu = document.getElementById('mobile-menu');
         const mainHeader = document.getElementById('main-header');
         const backToTopBtn = document.getElementById('back-to-top-btn');
+        const thankYouModal = document.getElementById('thank-you-modal');
+        const closeModalBtn = document.getElementById('close-modal-btn');
 
+        // Mobile Menu Toggle
         burgerMenuBtn.addEventListener('click', () => {
             mobileMenu.classList.toggle('hidden');
         });
         
+        // Scroll Behavior
         let lastScrollY = window.scrollY;
-
         window.addEventListener('scroll', () => {
             const currentScrollY = window.scrollY;
 
+            // Auto-hide header
             if (currentScrollY > lastScrollY && currentScrollY > 150) {
                 mainHeader.classList.add('-translate-y-full');
             } else {
                 mainHeader.classList.remove('-translate-y-full');
             }
             
+            // Header background opacity
             if (currentScrollY > 50) {
                 mainHeader.classList.add('bg-black/80');
                 mainHeader.classList.remove('bg-black/30');
@@ -207,6 +221,7 @@
 
             lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY; 
 
+            // Back to top button visibility
             if (window.scrollY > 300) {
                 backToTopBtn.classList.remove('hidden');
             } else {
@@ -214,6 +229,7 @@
             }
         });
 
+        // Back to Top button click
         backToTopBtn.addEventListener('click', (e) => {
             e.preventDefault();
             window.scrollTo({
@@ -221,6 +237,30 @@
                 behavior: 'smooth'
             });
         });
+
+        // Thank You Modal Logic
+        if (thankYouModal && closeModalBtn) {
+            // Show modal if the 'submitted' param is in the URL
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('submitted') === 'true') {
+                thankYouModal.classList.remove('hidden');
+            }
+
+            // Function to close the modal
+            const hideModal = () => {
+                thankYouModal.classList.add('hidden');
+            };
+
+            // Close modal when the close button is clicked
+            closeModalBtn.addEventListener('click', hideModal);
+
+            // Close modal when clicking on the overlay background
+            thankYouModal.addEventListener('click', (e) => {
+                if (e.target.id === 'thank-you-modal') {
+                    hideModal();
+                }
+            });
+        }
     </script>
 
 </body>

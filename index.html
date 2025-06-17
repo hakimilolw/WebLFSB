@@ -53,6 +53,7 @@
                             <a href="vision-mission.html" class="block w-full text-left px-4 py-2 text-sm text-white/90 hover:bg-gray-700/50 hover:text-white">Vision & Mission</a>
                             <a href="policies.html" class="block w-full text-left px-4 py-2 text-sm text-white/90 hover:bg-gray-700/50 hover:text-white">Our Policies</a>
                             <a href="cert.html" class="block w-full text-left px-4 py-2 text-sm text-white/90 hover:bg-gray-700/50 hover:text-white">Certification</a>
+                            <a href="track-record.html" class="block w-full text-left px-4 py-2 text-sm text-white/90 hover:bg-gray-700/50 hover:text-white">Track Record</a>
                         </div>
                     </div>
                     <a href="what-we-do.html" class="text-white/90 uppercase text-sm font-medium tracking-wider transition-colors duration-300 hover:text-white">What We Do</a>
@@ -84,7 +85,8 @@
                 <a href="who-we-are.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Overview</a><br>
                 <a href="vision-mission.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Vision & Mission</a><br>
                 <a href="policies.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Our Policies</a><br>
-                <a href="cert.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Certification</a>
+                <a href="cert.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Certification</a><br>
+                <a href="track-record.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Track Record</a>
             </div>
             <a href="what-we-do.html" class="text-white/90 uppercase text-lg font-medium tracking-wider transition-colors duration-300 hover:text-white">What We Do</a>
             <a href="contact-us.html" class="text-white/90 uppercase text-lg font-medium tracking-wider transition-colors duration-300 hover:text-white">Contact Us</a>
@@ -210,13 +212,11 @@
 
         window.addEventListener('scroll', () => {
             const currentScrollY = window.scrollY;
-
             if (currentScrollY > lastScrollY && currentScrollY > 150) {
                 mainHeader.classList.add('-translate-y-full');
             } else {
                 mainHeader.classList.remove('-translate-y-full');
             }
-            
             if (currentScrollY > 50) {
                 mainHeader.classList.add('bg-black/80');
                 mainHeader.classList.remove('bg-black/30');
@@ -224,9 +224,7 @@
                 mainHeader.classList.add('bg-black/30');
                 mainHeader.classList.remove('bg-black/80');
             }
-
             lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY; 
-
             if (window.scrollY > 300) {
                 backToTopBtn.classList.remove('hidden');
             } else {

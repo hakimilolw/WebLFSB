@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submission Dashboard - Legasi Futura (MySQL)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .submission-card {
+            transition: opacity 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <header id="main-header" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-black/30 backdrop-blur-sm">
+        </header>
+
+    <main class="pt-32 pb-20 bg-gray-100 min-h-screen">
+        <div class="container mx-auto px-6">
+            <div class="text-center">
+                <h1 class="text-4xl md:text-5xl font-extrabold text-gray-800">Submissions Dashboard</h1>
+                <p class="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">Add and track ongoing report submissions. Data is shared across all users.</p>
+            </div>
+
+            <div class="max-w-4xl mx-auto mt-12 bg-white p-8 rounded-xl shadow-md">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Add New Submission</h2>
+                <form id="submission-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="md:col-span-2">
+                        <label for="fileName" class="block text-sm font-medium text-gray-700">File Name</label>
+                        <input type="text" id="fileName" name="fileName" required class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label for="deadlineDate" class="block text-sm font-medium text-gray-700">Deadline Date</label>
+                        <input type="date" id="deadlineDate" name="deadlineDate" required class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label for="deadlineTime" class="block text-sm font-medium text-gray-700">Time</label>
+                        <input type="time" id="deadlineTime" name="deadlineTime" required class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label for="inCharge" class="block text-sm font-medium text-gray-700">In Charge</label>
+                        <input type="text" id="inCharge" name="inCharge" required class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+                        <textarea id="description" name="description" rows="3" class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"></textarea>
+                    </div>
+                    <div class="md:col-span-2">
+                        <button type="submit" class="w-full mt-4 bg-blue-900 text-white font-bold py-3 px-6 rounded-md hover:bg-blue-700 transition-colors duration-300">Add Submission</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="max-w-7xl mx-auto mt-12">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-3xl font-bold text-gray-800">Upcoming Deadlines</h2>
+                </div>
+                <div id="dashboard-container" class="space-y-8">
+                    </div>
+            </div>
+        </div>
+    </main>
+    
+    <footer class="bg-gray-800 text-white py-12">
+       </footer>
+    <div class="text-center text-white text-sm py-6 bg-black">&copy; 2025 Legasi Futura Sdn. Bhd. All rights reserved.</div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const submissionForm = document.getElementById('submission-form');
+        const dashboardContainer = document.getElementById('dashboard-container');
+
+        const formatTime = (time24) => {
+            if (!time24) return '';
+            const [hours, minutes] = time24.split(':');
+            const h = parseInt(hours, 10);
+            const ampm = h >= 12 ? 'PM' : 'AM';
+            const hour12 = h % 12 || 12;
+            return `${String(hour12).padStart(2, '0')}:${minutes} ${ampm}`;
+        };
+
+        const renderSubmissions = (submissions) => {
+            dashboardContainer.innerHTML = '';
+            if (submissions.length === 0) {
+                dashboardContainer.innerHTML = '<p class="text-gray-500 text-center">No submissions yet. Add one using the form above.</p>';
+                return;
+            }
+
+            const groupedByDay = submissions.reduce((acc, submission) => {
+                const date = new Date(`${submission.deadlineDate}T00:00:00`);
+                const dayKey = date.toISOString().split('T')[0];
+                if (!acc[dayKey]) {
+                    acc[dayKey] = { dateObj: date, submissions: [] };
+                }
+                acc[dayKey].submissions.push(submission);
+                return acc;
+            }, {});
+
+            const sortedDayKeys = Object.keys(groupedByDay).sort();
+
+            sortedDayKeys.forEach(dayKey => {
+                const { dateObj, submissions: submissionsForDay } = groupedByDay[dayKey];
+                submissionsForDay.sort((a, b) => (a.isDone - b.isDone));
+
+                const count = submissionsForDay.length;
+                const daySection = document.createElement('div');
+                daySection.innerHTML = `
+                    <h3 class="text-2xl font-bold text-gray-700 mb-4">${dateObj.toLocaleDateString('en-US', { weekday: 'long' })}, ${dateObj.toLocaleDateString('en-GB')} <span class="text-base font-normal text-gray-500">(${count} submission${count > 1 ? 's' : ''})</span></h3>
+                    <div class="bg-white rounded-lg shadow p-4 space-y-4">
+                        ${submissionsForDay.map(sub => `
+                            <div class="submission-card border-b last:border-b-0 pb-3 last:pb-0 ${sub.isDone ? 'opacity-50' : ''}">
+                                <div class="flex justify-between items-start">
+                                    <div class="flex items-start space-x-4">
+                                        <input type="checkbox" class="mark-as-done mt-1 h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded cursor-pointer" data-id="${sub.id}" ${sub.isDone ? 'checked' : ''}>
+                                        <div>
+                                            <p class="font-bold text-lg ${sub.isDone ? 'line-through text-gray-500' : 'text-gray-800'}">${sub.fileName}</p>
+                                            <p class="text-sm text-gray-500 ${sub.isDone ? 'line-through' : ''}">In Charge: ${sub.inCharge}</p>
+                                            ${sub.description ? `<p class="text-sm text-gray-600 mt-2 pt-2 border-t ${sub.isDone ? 'line-through' : ''}">${sub.description}</p>` : ''}
+                                        </div>
+                                    </div>
+                                    <div class="text-right flex-shrink-0 ml-4">
+                                        <p class="font-semibold text-lg ${sub.isDone ? 'line-through text-gray-500' : 'text-red-600'}">${formatTime(sub.deadlineTime)}</p>
+                                        <p class="text-xs text-gray-400 ${sub.isDone ? 'line-through' : ''}">${sub.deadlineDate}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>`;
+                dashboardContainer.appendChild(daySection);
+            });
+        };
+
+        const fetchSubmissions = async () => {
+            try {
+                const response = await fetch('get_submissions.php');
+                const submissions = await response.json();
+                if (submissions.error) {
+                    throw new Error(submissions.error);
+                }
+                renderSubmissions(submissions);
+            } catch (error) {
+                console.error("Error fetching submissions:", error);
+                dashboardContainer.innerHTML = '<p class="text-red-500 text-center">Could not load submissions. Please check the backend connection.</p>';
+            }
+        };
+
+        submissionForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(submissionForm);
+
+            try {
+                const response = await fetch('add_submission.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    submissionForm.reset();
+                    localStorage.removeItem('submissionDraft'); // Clear draft on success
+                    fetchSubmissions(); // Refresh the list
+                } else {
+                    throw new Error(result.message || "Unknown error occurred.");
+                }
+            } catch (error) {
+                console.error("Error adding document:", error);
+                alert("Error: Could not add submission.");
+            }
+        });
+
+        dashboardContainer.addEventListener('change', async (e) => {
+            if (e.target.classList.contains('mark-as-done')) {
+                const submissionId = e.target.dataset.id;
+                const isDone = e.target.checked;
+                
+                try {
+                    const response = await fetch('update_submission.php', {
+                        method: 'POST', // or 'PUT'
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ id: submissionId, isDone: isDone })
+                    });
+                    const result = await response.json();
+
+                    if (result.success) {
+                        fetchSubmissions(); // Refresh the list to show the change
+                    } else {
+                        throw new Error(result.message || "Unknown error occurred.");
+                    }
+                } catch (error) {
+                    console.error("Error updating document:", error);
+                    alert("Error: Could not update submission status.");
+                    // Optional: revert checkbox state if update fails
+                    e.target.checked = !isDone;
+                }
+            }
+        });
+        
+        // --- LOCAL STORAGE DRAFT LOGIC (Unchanged) ---
+        const loadDraft = () => {
+            const draft = localStorage.getItem('submissionDraft');
+            if (draft) {
+                const draftData = JSON.parse(draft);
+                document.getElementById('fileName').value = draftData.fileName || '';
+                document.getElementById('deadlineDate').value = draftData.deadlineDate || '';
+                document.getElementById('deadlineTime').value = draftData.deadlineTime || '';
+                document.getElementById('inCharge').value = draftData.inCharge || '';
+                document.getElementById('description').value = draftData.description || '';
+            }
+        };
+
+        submissionForm.addEventListener('input', () => {
+            const draftData = {
+                fileName: document.getElementById('fileName').value,
+                deadlineDate: document.getElementById('deadlineDate').value,
+                deadlineTime: document.getElementById('deadlineTime').value,
+                inCharge: document.getElementById('inCharge').value,
+                description: document.getElementById('description').value,
+            };
+            localStorage.setItem('submissionDraft', JSON.stringify(draftData));
+        });
+
+        // Initial actions on page load
+        loadDraft();
+        fetchSubmissions();
+    });
+    </script>
+</body>
+</html>

@@ -125,13 +125,10 @@
             const firebaseConfig = {
                 apiKey: "AIzaSyBoR4lAyQEFow5BTgbQ9Q-6Uyd_JE9G4RE",
                 authDomain: "submission-69979.firebaseapp.com",
-                databaseURL: "https://submission-69979-default-rtdb.asia-southeast1.firebasedatabase.app",
                 projectId: "submission-69979",
                 storageBucket: "submission-69979.firebasestorage.app",
                 messagingSenderId: "407010052449",
-                appId: "1:407010052449:web:99c4772d7a2328f23c1d20",
-                measurementId: "G-MXECN3YN5R"
-
+                appId: "1:407010052449:web:99c4772d7a2328f23c1d20"
             };
             // =================================================================
 
@@ -141,8 +138,35 @@
 
             const submissionForm = document.getElementById('submission-form');
             const dashboardContainer = document.getElementById('dashboard-container');
+            
+            // --- NEW: Function to load saved form data from localStorage ---
+            const loadDraft = () => {
+                const draft = localStorage.getItem('submissionDraft');
+                if (draft) {
+                    const draftData = JSON.parse(draft);
+                    document.getElementById('fileName').value = draftData.fileName || '';
+                    document.getElementById('deadlineDate').value = draftData.deadlineDate || '';
+                    document.getElementById('deadlineTime').value = draftData.deadlineTime || '';
+                    document.getElementById('inCharge').value = draftData.inCharge || '';
+                    document.getElementById('description').value = draftData.description || '';
+                }
+            };
+            
+            // --- NEW: Event listener to save form data as user types ---
+            submissionForm.addEventListener('input', () => {
+                const draftData = {
+                    fileName: document.getElementById('fileName').value,
+                    deadlineDate: document.getElementById('deadlineDate').value,
+                    deadlineTime: document.getElementById('deadlineTime').value,
+                    inCharge: document.getElementById('inCharge').value,
+                    description: document.getElementById('description').value,
+                };
+                localStorage.setItem('submissionDraft', JSON.stringify(draftData));
+            });
+
 
             const formatTime = (time24) => {
+                // ... (rest of your existing functions are the same) ...
                 if (!time24) return '';
                 const [hours, minutes] = time24.split(':');
                 const h = parseInt(hours, 10);
@@ -153,7 +177,8 @@
             
             // REAL-TIME LISTENER
             db.collection("submissions").orderBy("deadlineDate", "asc").orderBy("deadlineTime", "asc").onSnapshot(querySnapshot => {
-                dashboardContainer.innerHTML = ''; // Clear the dashboard
+                // ... (this entire function remains exactly the same) ...
+                dashboardContainer.innerHTML = ''; 
                 const submissions = [];
                 querySnapshot.forEach(doc => {
                     submissions.push({ id: doc.id, ...doc.data() });
@@ -165,8 +190,8 @@
                 }
 
                 const groupedByDay = submissions.reduce((acc, submission) => {
-                    const date = new Date(`${submission.deadlineDate}T00:00:00`); // Use midnight to avoid timezone issues
-                    const dayKey = date.toISOString().split('T')[0]; // YYYY-MM-DD format for reliable sorting
+                    const date = new Date(`${submission.deadlineDate}T00:00:00`);
+                    const dayKey = date.toISOString().split('T')[0];
                     if (!acc[dayKey]) {
                         acc[dayKey] = {
                             dateObj: date,
@@ -181,7 +206,7 @@
 
                 sortedDayKeys.forEach(dayKey => {
                     const { dateObj, submissions: submissionsForDay } = groupedByDay[dayKey];
-                    submissionsForDay.sort((a, b) => (a.isDone - b.isDone)); // Sort completed to the bottom
+                    submissionsForDay.sort((a, b) => (a.isDone - b.isDone)); 
                     
                     const count = submissionsForDay.length;
 
@@ -227,6 +252,8 @@
                 db.collection("submissions").add(newSubmission)
                     .then(() => {
                         submissionForm.reset();
+                        // --- NEW: Clear the draft from localStorage after successful submission ---
+                        localStorage.removeItem('submissionDraft');
                     })
                     .catch((error) => {
                         console.error("Error adding document: ", error);
@@ -235,6 +262,7 @@
             });
             
             dashboardContainer.addEventListener('change', (e) => {
+                 // ... (this entire function remains exactly the same) ...
                 if (e.target.classList.contains('mark-as-done')) {
                     const submissionId = e.target.dataset.id;
                     const isDone = e.target.checked;
@@ -247,7 +275,11 @@
                 }
             });
 
+            // --- NEW: Call the function to load the draft when the page loads ---
+            loadDraft();
         });
     </script>
+</body>
+</html>
 </body>
 </html>

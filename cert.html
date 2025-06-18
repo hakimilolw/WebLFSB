@@ -19,7 +19,7 @@
 </head>
 <body class="bg-gray-50 text-gray-800">
 
-        <header id="main-header" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-black/30 backdrop-blur-sm">
+        <header id="main-header" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-black">
         <div class="container mx-auto px-6 py-4">
             <div class="flex items-center justify-between">
                 <a href="index.html" class="flex items-center space-x-2">
@@ -191,27 +191,16 @@
             } else {
                 mainHeader.classList.remove('-translate-y-full');
             }
-            if (currentScrollY > 50) {
-                mainHeader.classList.add('bg-black/80');
-                mainHeader.classList.remove('bg-black/30');
-            } else {
-                mainHeader.classList.add('bg-black/30');
-                mainHeader.classList.remove('bg-black/80');
-            }
+            
             lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY; 
-            if (window.scrollY > 300) {
-                backToTopBtn.classList.remove('hidden');
-            } else {
-                backToTopBtn.classList.add('hidden');
+            
+            if (backToTopBtn) {
+                if (window.scrollY > 300) {
+                    backToTopBtn.classList.remove('hidden');
+                } else {
+                    backToTopBtn.classList.add('hidden');
+                }
             }
-        });
-
-        backToTopBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
         });
 
         // Certificate Modal Script

@@ -19,7 +19,7 @@
 </head>
 <body class="bg-white text-gray-800">
 
-        <header id="main-header" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-black/30 backdrop-blur-sm">
+        <header id="main-header" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-black">
         <div class="container mx-auto px-6 py-4">
             <div class="flex items-center justify-between">
                 <a href="index.html" class="flex items-center space-x-2">
@@ -204,30 +204,20 @@
         let lastScrollY = window.scrollY;
         window.addEventListener('scroll', () => {
             const currentScrollY = window.scrollY;
-
-            // Auto-hide header
             if (currentScrollY > lastScrollY && currentScrollY > 150) {
                 mainHeader.classList.add('-translate-y-full');
             } else {
                 mainHeader.classList.remove('-translate-y-full');
             }
             
-            // Header background opacity
-            if (currentScrollY > 50) {
-                mainHeader.classList.add('bg-black/80');
-                mainHeader.classList.remove('bg-black/30');
-            } else {
-                mainHeader.classList.add('bg-black/30');
-                mainHeader.classList.remove('bg-black/80');
-            }
-
             lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY; 
-
-            // Back to top button visibility
-            if (window.scrollY > 300) {
-                backToTopBtn.classList.remove('hidden');
-            } else {
-                backToTopBtn.classList.add('hidden');
+            
+            if (backToTopBtn) {
+                if (window.scrollY > 300) {
+                    backToTopBtn.classList.remove('hidden');
+                } else {
+                    backToTopBtn.classList.add('hidden');
+                }
             }
         });
 

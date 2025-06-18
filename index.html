@@ -35,11 +35,11 @@
 </head>
 <body class="bg-white text-black">
 
-    <header id="main-header" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-black/30 backdrop-blur-sm">
+    <header id="main-header" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-black">
         <div class="container mx-auto px-6 py-4">
             <div class="flex items-center justify-between">
                 <a href="index.html" class="flex items-center space-x-2">
-                    <img src="img/logo.png" alt="Legasi Futura Logo" class="h-10">
+                    <img src="img/full-logo.jpg" alt="Legasi Futura Logo" class="h-10">
                 </a>
                 <nav class="hidden lg:flex items-center space-x-6">
                     <a href="index.html" class="text-white/90 uppercase text-sm font-medium tracking-wider transition-colors duration-300 hover:text-white">Home</a>
@@ -209,7 +209,6 @@
         });
         
         let lastScrollY = window.scrollY;
-
         window.addEventListener('scroll', () => {
             const currentScrollY = window.scrollY;
             if (currentScrollY > lastScrollY && currentScrollY > 150) {
@@ -217,18 +216,15 @@
             } else {
                 mainHeader.classList.remove('-translate-y-full');
             }
-            if (currentScrollY > 50) {
-                mainHeader.classList.add('bg-black/80');
-                mainHeader.classList.remove('bg-black/30');
-            } else {
-                mainHeader.classList.add('bg-black/30');
-                mainHeader.classList.remove('bg-black/80');
-            }
+            
             lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY; 
-            if (window.scrollY > 300) {
-                backToTopBtn.classList.remove('hidden');
-            } else {
-                backToTopBtn.classList.add('hidden');
+            
+            if (backToTopBtn) {
+                if (window.scrollY > 300) {
+                    backToTopBtn.classList.remove('hidden');
+                } else {
+                    backToTopBtn.classList.add('hidden');
+                }
             }
         });
 

@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Item Tracking Dashboard - Legasi Futura</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        #main-header {
+            position: fixed !important;
+        }
+        /* --- Styles for Item Tracking Dashboard --- */
+        .dashboard-container { max-width: 1100px; margin: 20px auto; }
+        .dashboard { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        .dashboard h2, .dashboard h3 { text-align: center; color: #333; }
+        .dashboard table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .dashboard th, .dashboard td { padding: 12px; border: 1px solid #ddd; text-align: left; }
+        .dashboard th { background-color: #f2f2f2; }
+        .dashboard .actions a { margin-right: 10px; text-decoration: none; cursor: pointer; font-size: 1.2em; }
+        .dashboard .btn { padding: 10px 15px; background-color: #5cb85c; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); }
+        .modal-content { background-color: #fefefe; margin: 10% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 600px; border-radius: 8px; }
+        .modal .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; }
+        .modal .close:hover, .modal .close:focus { color: black; text-decoration: none; cursor: pointer; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; }
+        .form-group input, .form-group select, .form-group textarea { width: 95%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+        
+        .timeline { position: relative; list-style: none; padding: 0; margin-top: 20px; }
+        .timeline:before { content: ''; position: absolute; top: 0; bottom: 0; width: 2px; background: #ddd; left: 20px; }
+        .timeline-item { position: relative; margin-bottom: 20px; padding-left: 60px; }
+        .timeline-item:last-child { margin-bottom: 0; }
+        .timeline-icon { position: absolute; left: 0px; top: 0; width: 40px; height: 40px; border-radius: 50%; background: #fff; border: 3px solid #f2a202; }
+        .timeline-item.delivered .timeline-icon { background: #28a745; border-color: #28a745; color: white; display: flex; align-items: center; justify-content: center; font-size: 1.5em; }
+        .timeline-item.delivered .timeline-icon:before { content: '✔'; }
+        .timeline-body { position: relative; top: -5px; }
+        .timeline-body .time { font-size: 0.9em; color: #888; margin-bottom: 5px; }
+        .timeline-body h4 { margin: 0 0 5px 0; font-size: 1.1em; }
+        .timeline-body p { margin: 0; color: #666; font-size: 1em; }
+
+        #notification {
+            position: fixed;
+            top: 80px; /* Adjusted for fixed header */
+            right: 20px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: visibility 0s 0.5s, opacity 0.5s linear;
+        }
+        #notification.show {
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.5s linear;
+        }
+    </style>
+</head>
+<body class="bg-white text-gray-800">
+
+    <header id="main-header" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-black">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <a href="index.html" class="flex items-center space-x-2">
+                    <img src="img/logo.png" alt="Legasi Futura Logo" class="h-10">
+                </a>
+                <nav class="hidden lg:flex items-center space-x-6">
+                    <a href="index.html" class="text-white/90 uppercase text-sm font-medium tracking-wider transition-colors duration-300 hover:text-white">Home</a>
+                    <div class="relative group">
+                        <button class="flex items-center space-x-1 text-white/90 uppercase text-sm font-medium tracking-wider transition-colors duration-300 hover:text-white">
+                            <span>Who We Are</span>
+                            <svg class="w-4 h-4 transition-transform duration-300 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                        <div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-gray-800 rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 invisible group-hover:visible pt-2 pb-2">
+                            <a href="who-we-are.html" class="block w-full text-left px-4 py-2 text-sm text-white/90 hover:bg-gray-700 hover:text-white">Overview</a>
+                            <a href="vision-mission.html" class="block w-full text-left px-4 py-2 text-sm text-white/90 hover:bg-gray-700 hover:text-white">Vision & Mission</a>
+                            <a href="policies.html" class="block w-full text-left px-4 py-2 text-sm text-white/90 hover:bg-gray-700 hover:text-white">Our Policies</a>
+                            <a href="cert.html" class="block w-full text-left px-4 py-2 text-sm text-white/90 hover:bg-gray-700 hover:text-white">Certification</a>
+                            <a href="track-record.html" class="block w-full text-left px-4 py-2 text-sm text-white/90 hover:bg-gray-700 hover:text-white">Track Record</a>
+                        </div>
+                    </div>
+                    <a href="what-we-do.html" class="text-white/90 uppercase text-sm font-medium tracking-wider transition-colors duration-300 hover:text-white">What We Do</a>
+                    <a href="contact-us.html" class="text-white/90 uppercase text-sm font-medium tracking-wider transition-colors duration-300 hover:text-white">Contact Us</a>
+                    <a href="career-internship.html" class="text-white/90 uppercase text-sm font-medium tracking-wider transition-colors duration-300 hover:text-white">Career / Internship</a>
+                    <button class="text-white/90 hover:text-white transition-colors duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    </button>
+                </nav>
+                <div class="lg:hidden flex items-center space-x-4">
+                     <button class="text-white/90 hover:text-white transition-colors duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    </button>
+                    <button id="burger-menu" class="text-white focus:outline-none">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div id="mobile-menu" class="hidden lg:hidden fixed inset-0 bg-gray-900/95 backdrop-blur-md z-40 pt-24">
+        <nav class="flex flex-col items-center space-y-8">
+            <a href="index.html" class="text-white/90 uppercase text-lg font-medium tracking-wider transition-colors duration-300 hover:text-white">Home</a>
+            <a href="who-we-are.html" class="text-white/90 uppercase text-lg font-medium tracking-wider transition-colors duration-300 hover:text-white">Who We Are</a>
+            <div class="-mt-6 pl-4">
+                <a href="who-we-are.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Overview</a><br>
+                <a href="vision-mission.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Vision & Mission</a><br>
+                <a href="policies.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Our Policies</a><br>
+                <a href="cert.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Certification</a><br>
+                <a href="track-record.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Track Record</a>
+            </div>
+            <a href="what-we-do.html" class="text-white/90 uppercase text-lg font-medium tracking-wider transition-colors duration-300 hover:text-white">What We Do</a>
+            <a href="contact-us.html" class="text-white/90 uppercase text-lg font-medium tracking-wider transition-colors duration-300 hover:text-white">Contact Us</a>
+            <a href="career-internship.html" class="text-white/90 uppercase text-lg font-medium tracking-wider transition-colors duration-300 hover:text-white">Career / Internship</a>
+        </nav>
+    </div>
+
+    <div id="main-container">
+        <main class="pt-32 pb-20">
+            <div id="notification"></div>
+            <div class="dashboard-container">
+                <div class="dashboard">
+                    <h2>Staff View - Item Dashboard</h2>
+                    <button class="btn" id="addNewItemBtn">Add new item</button>
+                    <table id="itemTable">
+                        <thead>
+                            <tr>
+                                <th>Item Name</th>
+                                <th>Item ID</th>
+                                <th>Recipient</th>
+                                <th>Progress</th>
+                                <th>ETA</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+            </main>
+
+        <footer class="bg-gray-800 text-white py-12">
+            <div class="container mx-auto px-6">
+                <div class="text-center md:text-left">
+                    <div class="mb-6 md:mb-0">
+                        <img src="img/logo.png" alt="Legasi Futura Logo" class="h-10 mx-auto md:mx-0">
+                        <p class="text-sm text-gray-400 mt-4">1st Floor, Lot 2161 Block 5,</p>
+                        <p class="text-sm text-gray-400">Jalan Saberkas Utama, Jalan Pujut-Lutong,</p>
+                        <p class="text-sm text-gray-400">98000 Miri, Sarawak, Malaysia.</p>
+                        <div class="flex space-x-4 mt-4 justify-center md:justify-start">
+                            <a href="https://www.linkedin.com/company/legasifutura/" class="text-gray-400 hover:text-white transition-colors duration-300">
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" clip-rule="evenodd"/></svg>
+                            </a>
+                            <a href="https://www.facebook.com/p/Legasi-Futura-100094370892508/" class="text-gray-400 hover:text-white transition-colors duration-300">
+                               <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"/></svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+        <div class="text-center text-white text-sm py-6 bg-black">
+            &copy; 2025 Legasi Futura Sdn. Bhd. All rights reserved.
+        </div>
+    </div>
+    
+    <div id="addItemModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Add New Item</h3>
+            <form id="addItemForm">
+                <div class="form-group"><label for="itemName">Item Name</label><input type="text" id="itemName" required></div>
+                <div class="form-group"><label for="itemId">Item ID</label><input type="text" id="itemId" required></div>
+                <div class="form-group"><label for="receipient">Recipient</label><input type="text" id="receipient" required></div>
+                <div class="form-group"><label for="eta">ETA</label><input type="text" id="eta" required></div>
+                <button type="submit" class="btn">Submit</button>
+            </form>
+        </div>
+    </div>
+    <div id="editItemModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Edit Item</h3>
+            <form id="editItemForm">
+                <input type="hidden" id="editItemRowId">
+                <div class="form-group"><label for="editItemName">Item Name</label><input type="text" id="editItemName" required></div>
+                <div class="form-group"><label for="editItemIdNo">Item ID</label><input type="text" id="editItemIdNo" required></div>
+                <div class="form-group"><label for="editReceipient">Recipient</label><input type="text" id="editReceipient" required></div>
+                <div class="form-group">
+                    <label for="editProgress">Progress</label>
+                    <select id="editProgress" required>
+                        <option value="PO Received">PO Received</option>
+                        <option value="Submission GA Drawing to client">Submission GA Drawing to client</option>
+                        <option value="Kick off meeting">Kick off meeting</option>
+                        <option value="Purchasing of Materials">Purchasing of Materials</option>
+                        <option value="Procurement of Material">Procurement of Material</option>
+                        <option value="Drawing approve by client">Drawing approve by client</option>
+                        <option value="Manufacturing start">Manufacturing start</option>
+                        <option value="Valve assembly, pre testing">Valve assembly, pre testing</option>
+                        <option value="FAT procedure sent to client (10 days before FAT)">FAT procedure sent to client (10 days before FAT)</option>
+                        <option value="FAT with TPI">FAT with TPI</option>
+                        <option value="Painting and Coating">Painting and Coating</option>
+                        <option value="Packing">Packing</option>
+                        <option value="Delivery / custom clearance">Delivery / custom clearance</option>
+                        <option value="Delivery to site for SAT Test (witness by both client)">Delivery to site for SAT Test (witness by both client)</option>
+                        <option value="Touch-up painting then packing">Touch-up painting then packing</option>
+                        <option value="Delivery to client">Delivery to client</option>
+                        <option value="Final docs submit to client">Final docs submit to client</option>
+                    </select>
+                </div>
+                <div class="form-group"><label for="editDescription">Description</label><textarea id="editDescription" rows="3" required></textarea></div>
+                <div class="form-group"><label for="editDate">Date</label><input type="date" id="editDate" required></div>
+                <div class="form-group"><label for="editTime">Time</label><input type="time" id="editTime" required></div>
+                <div class="form-group"><label for="editEta">ETA</label><input type="text" id="editEta" required></div>
+                <button type="submit" class="btn">Submit</button>
+            </form>
+        </div>
+    </div>
+    <div id="viewProgressModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3 id="progressModalTitle">Progress Timeline</h3>
+            <ul id="progressTimeline" class="timeline"></ul>
+        </div>
+    </div>
+
+    <a href="https://wa.me/60138626042" class="float" target="_blank">
+        <i class="fa fa-whatsapp my-float"></i>
+    </a>
+    <a id="back-to-top-btn" href="#" class="hidden fixed bottom-28 right-10 bg-blue-900 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition-all duration-300 z-50">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
+    </a>
+
+    <script>
+        // --- Legasi Futura Template JS ---
+        const burgerMenuBtn = document.getElementById('burger-menu');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mainHeader = document.getElementById('main-header');
+        const backToTopBtn = document.getElementById('back-to-top-btn');
+
+        if (burgerMenuBtn) {
+            burgerMenuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+        }
+        
+        let lastScrollY = window.scrollY;
+        window.addEventListener('scroll', () => {
+            const currentScrollY = window.scrollY;
+            if (currentScrollY > lastScrollY && currentScrollY > 150) {
+                mainHeader.classList.add('-translate-y-full');
+            } else {
+                mainHeader.classList.remove('-translate-y-full');
+            }
+            
+            lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY; 
+            
+            if (backToTopBtn) {
+                if (window.scrollY > 300) {
+                    backToTopBtn.classList.remove('hidden');
+                } else {
+                    backToTopBtn.classList.add('hidden');
+                }
+            }
+        });
+
+        if (backToTopBtn) {
+            backToTopBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
+
+        // --- Item Tracker JS ---
+        document.addEventListener('DOMContentLoaded', function() {
+            const itemTableBody = document.getElementById('itemTable').getElementsByTagName('tbody')[0];
+            const addItemModal = document.getElementById('addItemModal');
+            const editItemModal = document.getElementById('editItemModal');
+            const viewProgressModal = document.getElementById('viewProgressModal');
+            const addNewItemBtn = document.getElementById('addNewItemBtn');
+            const closeBtns = document.querySelectorAll('.modal .close');
+            const notification = document.getElementById('notification');
+
+            function showNotification(message) {
+                notification.textContent = message;
+                notification.classList.add('show');
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+
+            function getItems() {
+                fetch('api.php?path=items')
+                    .then(response => response.ok ? response.json() : Promise.reject('Failed to load items'))
+                    .then(data => {
+                        itemTableBody.innerHTML = '';
+                        if (data && data.length > 0) {
+                            data.forEach(item => {
+                                let row = itemTableBody.insertRow();
+                                row.setAttribute('data-id', item.id);
+                                row.setAttribute('data-share-id', item.shareable_id);
+                                row.innerHTML = `
+                                    <td>${item.item_name}</td>
+                                    <td>${item.item_id}</td>
+                                    <td>${item.receipient}</td>
+                                    <td>${item.progress || 'N/A'}</td>
+                                    <td>${item.eta}</td>
+                                    <td class="actions">
+                                        <a href="#" class="view-progress" title="View Progress">&#128065;</a>
+                                        <a href="#" class="edit" title="Edit">&#9998;</a>
+                                        <a href="#" class="share" title="Copy Client URL">&#128279;</a>
+                                        <a href="#" class="delete" title="Delete">&#128465;</a>
+                                    </td>`;
+                            });
+                        }
+                    })
+                    .catch(error => console.error('Error fetching items:', error));
+            }
+
+            const closeAllModals = () => {
+                addItemModal.style.display = 'none';
+                editItemModal.style.display = 'none';
+                viewProgressModal.style.display = 'none';
+            };
+            addNewItemBtn.onclick = () => {
+                document.getElementById('addItemForm').reset();
+                addItemModal.style.display = 'block';
+            };
+            closeBtns.forEach(btn => btn.onclick = closeAllModals);
+            window.onclick = event => {
+                if (event.target.classList.contains('modal')) {
+                    closeAllModals();
+                }
+            };
+
+            document.getElementById('addItemForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const itemData = {
+                    itemName: document.getElementById('itemName').value,
+                    itemId: document.getElementById('itemId').value,
+                    receipient: document.getElementById('receipient').value,
+                    eta: document.getElementById('eta').value
+                };
+                fetch('api.php?path=addItem', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(itemData)
+                }).then(res => res.json()).then(data => {
+                    closeAllModals(); getItems(); showNotification(data.message || 'Item added!');
+                }).catch(err => console.error('Error:', err));
+            });
+
+            document.getElementById('editItemForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const id = document.getElementById('editItemRowId').value;
+                const itemData = {
+                    itemName: document.getElementById('editItemName').value,
+                    itemId: document.getElementById('editItemIdNo').value,
+                    receipient: document.getElementById('editReceipient').value,
+                    progress: document.getElementById('editProgress').value,
+                    description: document.getElementById('editDescription').value,
+                    date: document.getElementById('editDate').value,
+                    time: document.getElementById('editTime').value,
+                    eta: document.getElementById('editEta').value,
+                };
+                fetch(`api.php?path=editItem/${id}`, {
+                    method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(itemData)
+                }).then(res => res.json()).then(data => {
+                    closeAllModals(); getItems(); showNotification(data.message || 'Item updated!');
+                }).catch(err => console.error('Error:', err));
+            });
+
+            itemTableBody.addEventListener('click', function(e) {
+                const targetLink = e.target.closest('a');
+                if (!targetLink) return;
+                e.preventDefault();
+                const row = targetLink.closest('tr');
+                const id = row.getAttribute('data-id');
+                const shareId = row.getAttribute('data-share-id');
+
+                if (targetLink.classList.contains('view-progress')) {
+                    document.getElementById('progressModalTitle').textContent = `Progress for ${row.cells[0].innerText}`;
+                    const timeline = document.getElementById('progressTimeline');
+                    timeline.innerHTML = '<li>Loading...</li>';
+                    viewProgressModal.style.display = 'block';
+                    fetch(`api.php?path=progress/${id}`).then(res => res.ok ? res.json() : Promise.reject('Failed to load progress'))
+                    .then(progressData => {
+                        timeline.innerHTML = '';
+                        if (progressData && progressData.length > 0) {
+                            progressData.forEach(p => {
+                                const isDelivered = p.progress.toLowerCase() === 'delivery to client';
+                                const date = new Date(`${p.date}T${p.time}`).toLocaleDateString('en-GB');
+                                const time = new Date(`${p.date}T${p.time}`).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+                                timeline.innerHTML += `<li class="timeline-item ${isDelivered ? 'delivered' : ''}"><div class="timeline-icon"></div><div class="timeline-body"><div class="time">${date} ${time}</div><h4>${p.progress}</h4><p>${p.description}</p></div></li>`;
+                            });
+                        } else {
+                            timeline.innerHTML = '<li>No progress has been recorded for this item yet.</li>';
+                        }
+                    }).catch(err => { timeline.innerHTML = '<li>Could not load progress data.</li>'; console.error(err); });
+                }
+
+                if (targetLink.classList.contains('edit')) {
+                    document.getElementById('editItemForm').reset();
+                    document.getElementById('editItemRowId').value = id;
+                    document.getElementById('editItemName').value = row.cells[0].innerText;
+                    document.getElementById('editItemIdNo').value = row.cells[1].innerText;
+                    document.getElementById('editReceipient').value = row.cells[2].innerText;
+                    document.getElementById('editEta').value = row.cells[4].innerText;
+                    document.getElementById('editDate').valueAsDate = new Date();
+                    document.getElementById('editTime').value = new Date().toTimeString().slice(0, 5);
+                    editItemModal.style.display = 'block';
+                }
+
+                if (targetLink.classList.contains('share')) {
+                    const clientUrl = `${window.location.origin}${window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'))}/client_view.php?id=${shareId}`;
+                    navigator.clipboard.writeText(clientUrl).then(() => showNotification('Client view URL copied to clipboard!'));
+                }
+
+                if (targetLink.classList.contains('delete')) {
+                    if (confirm(`Are you sure you want to delete Item ID: ${row.cells[1].innerText}?`)) {
+                        fetch(`api.php?path=deleteItem/${id}`, { method: 'DELETE' }).then(res => res.json())
+                        .then((data) => { getItems(); showNotification(data.message || 'Item deleted!');
+                        }).catch(err => console.error('Error:', err));
+                    }
+                }
+            });
+            
+            getItems();
+        });
+    </script>
+
+</body>
+</html>

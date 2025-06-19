@@ -126,15 +126,21 @@
                                     <div class="lg:col-span-2"><img src="img/services/mtmg.jpg" alt="MTM-G Technology" class="rounded-lg shadow-md w-full"></div>
                                     <div class="lg:col-span-3">
                                         <p class="text-gray-600">This non-contact solution monitors the real condition of pipelines by measuring their magnetic field strength. It effectively locates stress concentration areas, assessing danger levels for aboveground, underground, and underwater pipelines without service interruption.</p>
+                                        <button data-pdf-src="pdf/brochures/LFSB - MTM-G Technology Brochure.pdf" class="brochure-modal-trigger mt-4 inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-300">
+                                            See More <i class="fa fa-external-link ml-1"></i>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
                              <div>
                                 <h3 class="text-2xl font-semibold text-blue-900 mb-4">Electro Scan Leak Detection</h3>
                                 <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 items-center">
-                                    <div class="lg:col-span-2 lg:order-last"><img src="img/services/ElectroScan.png" alt="Electro Scan Technology" class="rounded-lg shadow-md w-full"></div>
+                                    <div class="lg:col-span-2 lg:order-last"><img src="img/services/ElectroScan.jpeg" alt="Electro Scan Technology" class="rounded-lg shadow-md w-full"></div>
                                     <div class="lg:col-span-3">
                                         <p class="text-gray-600">Using electrical current, this technology accurately detects and measures all pipe defects, including those hidden in joints and cracks. It rapidly pinpoints the exact location and size of leaks, and can even identify illegal water pipe connections.</p>
+                                        <button data-pdf-src="pdf/brochures/LFSB - Electro Scan - Leak Detection Technology Brochure.pdf" class="brochure-modal-trigger mt-4 inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-300">
+                                            See More <i class="fa fa-external-link ml-1"></i>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -220,6 +226,16 @@
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
     </a>
 
+    <!-- Brochure Modal -->
+    <div id="brochure-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-[100] p-4">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl h-[90vh] relative">
+            <button id="close-brochure-modal" class="absolute -top-3 -right-3 bg-gray-700 text-white rounded-full p-2 z-10 hover:bg-black transition-colors duration-200">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <iframe id="modal-brochure-pdf" src="" class="w-full h-full" title="Brochure PDF"></iframe>
+        </div>
+    </div>
+
     <script>
         // --- Standard Page Scripts ---
         const burgerMenuBtn = document.getElementById('burger-menu');
@@ -278,6 +294,40 @@
             });
         });
 
+        // --- Brochure Modal Script ---
+        const brochureModal = document.getElementById('brochure-modal');
+        const closeBrochureModalBtn = document.getElementById('close-brochure-modal');
+        const modalBrochurePdf = document.getElementById('modal-brochure-pdf');
+        const openBrochureModalBtns = document.querySelectorAll('.brochure-modal-trigger');
+
+        const hideBrochureModal = () => {
+            brochureModal.classList.add('hidden');
+            modalBrochurePdf.src = ''; // Clear src to stop video/audio if any and free up resources
+        };
+
+        openBrochureModalBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const pdfSrc = btn.dataset.pdfSrc;
+                if (pdfSrc) {
+                    modalBrochurePdf.src = pdfSrc;
+                    brochureModal.classList.remove('hidden');
+                }
+            });
+        });
+
+        closeBrochureModalBtn.addEventListener('click', hideBrochureModal);
+        
+        brochureModal.addEventListener('click', (e) => {
+            if (e.target.id === 'brochure-modal') { // Click outside the modal content
+                hideBrochureModal();
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === "Escape" && !brochureModal.classList.contains('hidden')) {
+                hideBrochureModal();
+            }
+        });
     </script>
 
 </body>

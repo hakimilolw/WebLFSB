@@ -85,7 +85,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 
                 <div class="bg-white rounded-lg shadow-lg overflow-hidden group">
-                    <button class="cert-modal-trigger w-full h-60 overflow-hidden" data-pdf-src="pdf/certs/LFSB - Petronas License_210125.pdf">
+                    <button class="cert-modal-trigger w-full h-60 overflow-hidden" data-image-src="img/certs/full_certs/LFSB - Petronas License.jpg">
                         <img src="img/certs/LFSB-Petronas-License.png" alt="PETRONAS License Thumbnail" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
                     </button>
                     <div class="p-4 text-center">
@@ -94,7 +94,7 @@
                 </div>
 
                 <div class="bg-white rounded-lg shadow-lg overflow-hidden group">
-                    <button class="cert-modal-trigger w-full h-60 overflow-hidden" data-pdf-src="pdf/certs/LFSB - CIDB Certificate 280126.pdf">
+                    <button class="cert-modal-trigger w-full h-60 overflow-hidden" data-image-src="img/certs/full_certs/LFSB-CIDB-Certificate.jpg">
                         <img src="img/certs/LFSB-CIDB-Certificate.png" alt="CIDB Certificate Thumbnail" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
                     </button>
                     <div class="p-4 text-center">
@@ -103,7 +103,7 @@
                 </div>
 
                 <div class="bg-white rounded-lg shadow-lg overflow-hidden group">
-                     <button class="cert-modal-trigger w-full h-60 overflow-hidden" data-pdf-src="pdf/certs/LFSB - Petros Certificate_P2400443 - S_26-May-2024.pdf">
+                     <button class="cert-modal-trigger w-full h-60 overflow-hidden" data-image-src="img/certs/full_certs/LFSB - Petros Certificate.jpg">
                         <img src="img/certs/LFSB-Petros-Certificate.png" alt="PETROS Certificate Thumbnail" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
                     </button>
                     <div class="p-4 text-center">
@@ -112,7 +112,7 @@
                 </div>
 
                 <div class="bg-white rounded-lg shadow-lg overflow-hidden group">
-                    <button class="cert-modal-trigger w-full h-60 overflow-hidden" data-pdf-src="pdf/certs/LSFB Cert of Incorporation.pdf">
+                    <button class="cert-modal-trigger w-full h-60 overflow-hidden" data-image-src="img/certs/full_certs/LSFB - Cert of Incorporation.jpg">
                         <img src="img/certs/LSFB-Cert-of-Incorporation.png" alt="Certificate of Incorporation Thumbnail" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
                     </button>
                     <div class="p-4 text-center">
@@ -121,7 +121,7 @@
                 </div>
 
                 <div class="bg-white rounded-lg shadow-lg overflow-hidden group">
-                    <button class="cert-modal-trigger w-full h-60 overflow-hidden" data-pdf-src="pdf/certs/Trade License_020725.pdf">
+                    <button class="cert-modal-trigger w-full h-60 overflow-hidden" data-image-src="img\certs\full_certs\LFSB - Trade License.jpg">
                         <img src="img/certs/Trade-License.png" alt="Trade License Thumbnail" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
                     </button>
                     <div class="p-4 text-center">
@@ -164,11 +164,13 @@
     </a>
 
     <div id="cert-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-[100] p-4">
-        <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl h-[90vh] relative">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] relative">
             <button id="close-cert-modal" class="absolute -top-3 -right-3 bg-gray-700 text-white rounded-full p-2 z-10 hover:bg-black transition-colors duration-200">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
-            <iframe id="modal-cert-pdf" src="" class="w-full h-full" title="Certificate PDF"></iframe>
+            <div class="overflow-y-auto max-h-[90vh]">
+                <img id="modal-cert-image" src="" alt="Certificate Image" class="w-full h-auto">
+            </div>
         </div>
     </div>
 
@@ -206,19 +208,19 @@
         // Certificate Modal Script
         const certModal = document.getElementById('cert-modal');
         const closeCertModalBtn = document.getElementById('close-cert-modal');
-        const modalCertPdf = document.getElementById('modal-cert-pdf');
+        const modalCertImage = document.getElementById('modal-cert-image');
         const openCertModalBtns = document.querySelectorAll('.cert-modal-trigger');
 
         const hideCertModal = () => {
             certModal.classList.add('hidden');
-            modalCertPdf.src = ''; 
+            modalCertImage.src = ''; 
         };
 
         openCertModalBtns.forEach(btn => {
             btn.addEventListener('click', () => {
-                const pdfSrc = btn.dataset.pdfSrc;
-                if (pdfSrc) {
-                    modalCertPdf.src = pdfSrc;
+                const imageSrc = btn.dataset.imageSrc;
+                if (imageSrc) {
+                    modalCertImage.src = imageSrc;
                     certModal.classList.remove('hidden');
                 }
             });

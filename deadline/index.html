@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Submission Dashboard - Legasi Futura (MySQL)</title>
+    <title>Submission Dashboard - Legasi Futura</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -15,6 +15,25 @@
         .submission-card {
             transition: opacity 0.3s ease-in-out;
         }
+        /* Style for priority select */
+        .priority-select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-color: transparent;
+            border: none;
+            padding: 0.1rem 0.5rem;
+            margin: 0;
+            font-family: inherit;
+            font-size: inherit;
+            cursor: pointer;
+            line-height: inherit;
+            outline: none;
+            border-radius: 5px;
+        }
+        .priority-High { background-color: #fecaca; color: #b91c1c; }
+        .priority-Medium { background-color: #fed7aa; color: #b45309; }
+        .priority-Low { background-color: #d1d5db; color: #374151; }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
@@ -29,6 +48,8 @@
             </div>
 
             <div class="max-w-7xl mx-auto mt-12">
+                <div id="highlights-container" class="mb-12"></div>
+
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="text-3xl font-bold text-gray-800">Upcoming Deadlines</h2>
                     <button id="toggle-form-btn" class="bg-blue-900 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-700 transition-colors duration-300">
@@ -59,7 +80,7 @@
                         <label for="deadlineTime" class="block text-sm font-medium text-gray-700"><i class="fa fa-clock-o mr-1 text-gray-500"></i>Time</label>
                         <input type="text" id="deadlineTime" name="deadlineTime" required placeholder="Select Time" class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                     </div>
-                    <div class="md:col-span-2">
+                    <div>
                         <label for="inCharge" class="block text-sm font-medium text-gray-700">In Charge</label>
                         <select name="inCharge" id="inCharge" class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                             <option value="">Select In Charge</option>
@@ -69,6 +90,10 @@
                             <option value="Azree">Azree</option>
                             <option value="Kimi">Kimi</option>
                         </select>
+                    </div>
+                    <div>
+                        <label for="client" class="block text-sm font-medium text-gray-700">Client</label>
+                        <input type="text" id="client" name="client" class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                     </div>
                     <div class="md:col-span-2">
                         <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
@@ -91,6 +116,7 @@
     document.addEventListener('DOMContentLoaded', () => {
         const submissionForm = document.getElementById('submission-form');
         const dashboardContainer = document.getElementById('dashboard-container');
+        const highlightsContainer = document.getElementById('highlights-container');
         const toggleFormBtn = document.getElementById('toggle-form-btn');
         const modalOverlay = document.getElementById('modal-overlay');
         const deadlineTimeInput = document.getElementById('deadlineTime');
@@ -107,79 +133,162 @@
 
         const renderSubmissions = (submissions) => {
             dashboardContainer.innerHTML = '';
+            highlightsContainer.innerHTML = '';
 
-            const today = new Date();
-            today.setHours(0, 0, 0, 0); 
-
-            const upcomingSubmissions = submissions.filter(sub => {
-                const deadline = new Date(sub.deadlineDate);
-                return deadline >= today;
-            });
-
-            if (upcomingSubmissions.length === 0) {
-                dashboardContainer.innerHTML = '<p class="text-gray-500 text-center">No upcoming submissions. Add one using the form above.</p>';
+            if (!Array.isArray(submissions)) {
+                dashboardContainer.innerHTML = '<p class="text-red-500 text-center">Error: Submissions data is not in the correct format.</p>';
                 return;
             }
 
-            const groupedByDay = upcomingSubmissions.reduce((acc, submission) => {
-                const date = new Date(`${submission.deadlineDate}T00:00:00`);
-                const dayKey = date.toISOString().split('T')[0];
-                if (!acc[dayKey]) {
-                    acc[dayKey] = { dateObj: date, submissions: [] };
-                }
-                acc[dayKey].submissions.push(submission);
-                return acc;
-            }, {});
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            const groupedByDay = submissions
+                .filter(sub => sub.deadlineDate)
+                .reduce((acc, submission) => {
+                    const date = new Date(`${submission.deadlineDate}T00:00:00`);
+                    if (isNaN(date.getTime())) return acc;
+                    
+                    const dayKey = date.toISOString().split('T')[0];
+                    if (!acc[dayKey]) {
+                        acc[dayKey] = { dateObj: date, submissions: [] };
+                    }
+                    acc[dayKey].submissions.push(submission);
+                    return acc;
+                }, {});
 
             const sortedDayKeys = Object.keys(groupedByDay).sort();
 
+            // --- LOGIC CHANGE IS HERE ---
+            // Use objects to group items for both highlights and the main list
+            let highlightGroups = {};
+            let upcomingGroups = {};
+
             sortedDayKeys.forEach(dayKey => {
                 const { dateObj, submissions: submissionsForDay } = groupedByDay[dayKey];
-                submissionsForDay.sort((a, b) => (a.isDone - b.isDone));
+                
+                if (Array.isArray(submissionsForDay)) {
+                    submissionsForDay.sort((a, b) => {
+                        if (a.isDone !== b.isDone) return a.isDone - b.isDone;
+                        return (a.deadlineTime || '').localeCompare(b.deadlineTime || '');
+                    });
+                }
+                
+                submissionsForDay.forEach(sub => {
+                    const deadline = new Date(sub.deadlineDate);
+                    deadline.setHours(0,0,0,0);
+                    const isUpcoming = deadline >= today && !sub.isDone;
+                    
+                    // Check if it's a highlight
+                    const isHighlight = isUpcoming && sub.priority === 'High';
+                    if (isHighlight) {
+                        if (!highlightGroups[dayKey]) {
+                           highlightGroups[dayKey] = { dateObj: dateObj, submissions: [] };
+                        }
+                        highlightGroups[dayKey].submissions.push(sub);
+                    }
 
-                const count = submissionsForDay.length;
-                const daySection = document.createElement('div');
-                daySection.innerHTML = `
-                    <h3 class="text-2xl font-bold text-gray-700 mb-4">${dateObj.toLocaleDateString('en-US', { weekday: 'long' })}, ${dateObj.toLocaleDateString('en-GB')} <span class="text-base font-normal text-gray-500">(${count} submission${count > 1 ? 's' : ''})</span></h3>
-                    <div class="bg-white rounded-lg shadow p-4 space-y-4">
-                        ${submissionsForDay.map(sub => `
-                            <div class="submission-card border-b last:border-b-0 pb-3 last:pb-0 ${sub.isDone ? 'opacity-50' : ''}">
-                                <div class="flex justify-between items-start">
-                                    <div class="flex items-start space-x-4">
-                                        <input type="checkbox" class="mark-as-done mt-1 h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded cursor-pointer" data-id="${sub.id}" ${sub.isDone ? 'checked' : ''}>
-                                        <div>
-                                            <p class="font-bold text-lg ${sub.isDone ? 'line-through text-gray-500' : 'text-gray-800'}">${sub.fileName}</p>
-                                            <p class="text-sm text-gray-500 ${sub.isDone ? 'line-through' : ''}">In Charge: ${sub.inCharge}</p>
-                                            ${sub.description ? `<p class="text-sm text-gray-600 mt-2 pt-2 border-t ${sub.isDone ? 'line-through' : ''}">${sub.description}</p>` : ''}
-                                        </div>
-                                    </div>
-                                    <div class="text-right flex-shrink-0 ml-4">
-                                        <div class="flex items-center justify-end space-x-2 ${sub.isDone ? 'text-gray-500' : 'text-red-600'}">
-                                            <i class="fa fa-clock-o text-base"></i>
-                                            <span class="font-semibold text-lg ${sub.isDone ? 'line-through' : ''}">${formatTime(sub.deadlineTime)}</span>
-                                            <button class="delete-submission text-red-500 hover:text-red-700" data-id="${sub.id}"><i class="fa fa-trash"></i></button>
-                                        </div>
-                                        <p class="text-xs text-gray-400 mt-0.5 ${sub.isDone ? 'line-through' : ''}">${sub.deadlineDate}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>`;
-                dashboardContainer.appendChild(daySection);
+                    // Check if it belongs in the main list (done or upcoming)
+                    if (isUpcoming || sub.isDone) {
+                        if (!upcomingGroups[dayKey]) {
+                           upcomingGroups[dayKey] = { dateObj: dateObj, submissions: [] };
+                        }
+                        upcomingGroups[dayKey].submissions.push(sub);
+                    }
+                });
             });
+
+            // --- Render Highlights Section (with date grouping) ---
+            let highlightsHTML = '';
+            Object.keys(highlightGroups).forEach(dayKey => {
+                const group = highlightGroups[dayKey];
+                const count = group.submissions.length;
+                highlightsHTML += `
+                    <div class="mb-4 last:mb-0">
+                        <h3 class="text-xl font-bold text-gray-700 mb-2">${group.dateObj.toLocaleDateString('en-US', { weekday: 'long' })}, ${group.dateObj.toLocaleDateString('en-GB')}</h3>
+                        <div class="bg-red-50 border-2 border-red-200 rounded-lg p-4 space-y-4">
+                            ${group.submissions.map(sub => createSubmissionHTML(sub)).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+
+            if (highlightsHTML) {
+                highlightsContainer.innerHTML = `
+                    <h2 class="text-3xl font-bold text-red-700 mb-4 flex items-center"><i class="fa fa-star mr-3"></i>High Priority Highlights</h2>
+                    <div class="space-y-4">${highlightsHTML}</div>`;
+            }
+
+            // --- Render Main Dashboard Section ---
+            let upcomingContent = '';
+            Object.keys(upcomingGroups).forEach(dayKey => {
+                const group = upcomingGroups[dayKey];
+                const upcomingCount = group.submissions.filter(s => !s.isDone && new Date(s.deadlineDate) >= today).length;
+                if (group.submissions.length > 0) {
+                     upcomingContent += `
+                        <h3 class="text-2xl font-bold text-gray-700 mb-4">${group.dateObj.toLocaleDateString('en-US', { weekday: 'long' })}, ${group.dateObj.toLocaleDateString('en-GB')} <span class="text-base font-normal text-gray-500">(${upcomingCount} upcoming)</span></h3>
+                        <div class="bg-white rounded-lg shadow p-4 space-y-4">
+                            ${group.submissions.map(sub => createSubmissionHTML(sub)).join('')}
+                        </div>
+                    `;
+                }
+            });
+
+            if (upcomingContent) {
+                dashboardContainer.innerHTML = upcomingContent;
+            }
+            
+            if (!highlightsHTML && !upcomingContent) {
+                dashboardContainer.innerHTML = '<p class="text-gray-500 text-center">No submissions to display. Add one using the form above.</p>';
+            }
+        };
+
+
+        const createSubmissionHTML = (sub) => {
+            const priorities = ['High', 'Medium', 'Low'];
+            const priorityOptions = priorities.map(p => `<option value="${p}" ${sub.priority === p ? 'selected' : ''}>${p} Priority</option>`).join('');
+
+            return `
+                <div class="submission-card border-b last:border-b-0 pb-3 last:pb-0 ${sub.isDone ? 'opacity-50' : ''}">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-start space-x-4">
+                            <input type="checkbox" class="mark-as-done mt-1 h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded cursor-pointer" data-id="${sub.id}" ${sub.isDone ? 'checked' : ''}>
+                            <div>
+                                <p class="font-bold text-lg ${sub.isDone ? 'line-through text-gray-500' : 'text-gray-800'}">${sub.fileName}</p>
+                                <div class="text-sm text-gray-500 ${sub.isDone ? 'line-through' : ''}">
+                                    <span>In Charge: ${sub.inCharge}</span>
+                                    ${sub.client ? `<span> | Client: <strong class="text-gray-600">${sub.client}</strong></span>` : ''}
+                                </div>
+                                ${sub.description ? `<p class="text-sm text-gray-600 mt-2 pt-2 border-t ${sub.isDone ? 'line-through' : ''}">${sub.description}</p>` : ''}
+                            </div>
+                        </div>
+                        <div class="text-right flex-shrink-0 ml-4">
+                            <div class="flex items-center justify-end space-x-2 ${sub.isDone ? 'text-gray-500' : 'text-red-600'}">
+                                <i class="fa fa-clock-o text-base"></i>
+                                <span class="font-semibold text-lg ${sub.isDone ? 'line-through' : ''}">${formatTime(sub.deadlineTime)}</span>
+                                <button class="delete-submission text-red-500 hover:text-red-700" data-id="${sub.id}"><i class="fa fa-trash"></i></button>
+                            </div>
+                            <div class="mt-2 flex items-center justify-end">
+                                <select class="priority-select font-semibold text-xs priority-${sub.priority}" data-id="${sub.id}">
+                                    ${priorityOptions}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
         };
 
         const fetchSubmissions = async () => {
             try {
                 const response = await fetch('get_submissions.php');
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 const submissions = await response.json();
-                if (submissions.error) {
-                    throw new Error(submissions.error);
-                }
+                if (submissions.error) throw new Error(submissions.error);
                 renderSubmissions(submissions);
             } catch (error) {
                 console.error("Error fetching submissions:", error);
-                dashboardContainer.innerHTML = '<p class="text-red-500 text-center">Could not load submissions. Please check the backend connection.</p>';
+                dashboardContainer.innerHTML = `<p class="text-red-500 text-center">Could not load submissions. Error: ${error.message}</p>`;
             }
         };
 
@@ -207,8 +316,8 @@
                 alert("Error: Could not add submission.");
             }
         });
-
-        dashboardContainer.addEventListener('click', async (e) => {
+        
+        const handleDashboardClick = async (e) => {
             if (e.target.closest('.delete-submission')) {
                 const submissionId = e.target.closest('.delete-submission').dataset.id;
                 if (confirm('Are you sure you want to delete this submission?')) {
@@ -230,9 +339,9 @@
                     }
                 }
             }
-        });
-
-        dashboardContainer.addEventListener('change', async (e) => {
+        };
+        
+        const handleDashboardChange = async (e) => {
             if (e.target.classList.contains('mark-as-done')) {
                 const submissionId = e.target.dataset.id;
                 const isDone = e.target.checked;
@@ -256,7 +365,35 @@
                     e.target.checked = !isDone;
                 }
             }
-        });
+            
+            if (e.target.classList.contains('priority-select')) {
+                const submissionId = e.target.dataset.id;
+                const newPriority = e.target.value;
+
+                try {
+                    const response = await fetch('update_priority.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ id: submissionId, priority: newPriority })
+                    });
+                    const result = await response.json();
+
+                    if (result.success) {
+                        fetchSubmissions();
+                    } else {
+                        throw new Error(result.message || "Unknown error occurred.");
+                    }
+                } catch (error) {
+                    console.error("Error updating priority:", error);
+                    alert("Error: Could not update priority.");
+                }
+            }
+        };
+
+        dashboardContainer.addEventListener('click', handleDashboardClick);
+        highlightsContainer.addEventListener('click', handleDashboardClick);
+        dashboardContainer.addEventListener('change', handleDashboardChange);
+        highlightsContainer.addEventListener('change', handleDashboardChange);
         
         const loadDraft = () => {
             const draft = localStorage.getItem('submissionDraft');
@@ -267,6 +404,7 @@
                 document.getElementById('deadlineTime').value = draftData.deadlineTime || '';
                 document.getElementById('inCharge').value = draftData.inCharge || '';
                 document.getElementById('description').value = draftData.description || '';
+                document.getElementById('client').value = draftData.client || '';
             }
         };
 
@@ -277,6 +415,7 @@
                 deadlineTime: document.getElementById('deadlineTime').value,
                 inCharge: document.getElementById('inCharge').value,
                 description: document.getElementById('description').value,
+                client: document.getElementById('client').value,
             };
             localStorage.setItem('submissionDraft', JSON.stringify(draftData));
         });
@@ -305,8 +444,8 @@
             flatpickr(deadlineTimeInput, {
                 enableTime: true,
                 noCalendar: true,
-                dateFormat: "h:i K",
-                time_24hr: false
+                dateFormat: "H:i",
+                time_24hr: true
             });
         }
 

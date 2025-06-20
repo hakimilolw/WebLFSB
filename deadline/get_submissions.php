@@ -1,11 +1,12 @@
 <?php
-ini_set('display_errors', 1); // Add these two lines for debugging
-error_reporting(E_ALL);       //
+ini_set('display_errors', 1); 
+error_reporting(E_ALL);       
 
 header('Content-Type: application/json');
 include 'db_config.php';
 
-$sql = "SELECT id, fileName, deadlineDate, deadlineTime, inCharge, description, isDone FROM submissions ORDER BY deadlineDate ASC, deadlineTime ASC";
+// Updated SQL to include the new 'client' and 'priority' fields
+$sql = "SELECT id, fileName, deadlineDate, deadlineTime, inCharge, description, client, priority, isDone FROM submissions ORDER BY deadlineDate ASC, deadlineTime ASC";
 $result = $conn->query($sql);
 
 $submissions = [];

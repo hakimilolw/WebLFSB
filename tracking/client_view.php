@@ -4,6 +4,7 @@ include 'config.php'; // Your database connection
 $shareable_id = isset($_GET['id']) ? $_GET['id'] : '';
 $item_details = null;
 $progress_history = [];
+$latest_progress = "Awaiting Progress"; // Default status
 
 if (!empty($shareable_id)) {
     // Fetch the main item details using the shareable ID
@@ -29,6 +30,11 @@ if (!empty($shareable_id)) {
             $progress_history[] = $row;
         }
         $stmt_progress->close();
+
+        // Get the latest progress status if history exists
+        if (!empty($progress_history)) {
+            $latest_progress = $progress_history[0]['progress'];
+        }
     }
     $stmt->close();
 }
@@ -58,14 +64,77 @@ $conn->close();
         .tracking-header h2 { text-align: right; color: #555; font-weight: normal; margin: 0; }
         .item-info { margin-top: 15px; }
         .item-info p { margin: 5px 0; font-size: 1.1em; color: #333; }
+        
         .timeline { position: relative; list-style: none; padding: 0; margin-top: 30px; }
-        .timeline:before { content: ''; position: absolute; top: 0; bottom: 0; width: 2px; background: #ddd; left: 20px; }
-        .timeline-item { position: relative; margin-bottom: 30px; padding-left: 60px; }
+        
+        .timeline:before { 
+            content: ''; 
+            position: absolute; 
+            top: 40px; 
+            bottom: 0; 
+            width: 2px; 
+            background: #ddd; 
+            left: 20px; /* Aligns with center of the 40px icon */
+        }
+
+        .timeline-item { position: relative; margin-bottom: 30px; padding-left: 70px; }
         .timeline-item:last-child { margin-bottom: 0; }
-        .timeline-icon { position: absolute; left: 0px; top: 0; width: 40px; height: 40px; border-radius: 50%; background: #fff; border: 3px solid #f2a202; }
-        .timeline-item.delivered .timeline-icon { background: #28a745; border-color: #28a745; color: white; display: flex; align-items: center; justify-content: center; font-size: 1.5em; }
+        
+        .timeline-icon { 
+            position: absolute; 
+            left: 0px; 
+            top: 0; 
+            width: 40px; 
+            height: 40px; 
+            border-radius: 50%; 
+            background: #fff; 
+            border: 3px solid #f2a202; 
+            z-index: 10;
+            /* The 'position: relative' that caused the error has been REMOVED */
+        }
+
+        /* Upward pointing arrow on the icon */
+        .timeline-icon::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            /* Position arrow on top of the icon */
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-bottom: 4px; /* Space between arrow and circle */
+            /* Create triangle shape */
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-bottom: 8px solid #f2a202; /* Arrow color */
+        }
+        
+        .timeline-item.delivered .timeline-icon { 
+            background: #28a745; 
+            border-color: #28a745; 
+            color: white; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 1.5em; 
+        }
         .timeline-item.delivered .timeline-icon:before { content: '✔'; }
-        .timeline-body { position: relative; top: -5px; }
+
+        /* Hide the arrow on the delivered icon */
+        .timeline-item.delivered .timeline-icon::after {
+            display: none;
+        }
+        
+        .timeline-body {
+            position: relative;
+            top: -5px;
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #eee;
+        }
+        
         .timeline-body .time { font-size: 0.9em; color: #888; margin-bottom: 5px; }
         .timeline-body h4 { margin: 0 0 5px 0; font-size: 1.1em; }
         .timeline-body p { margin: 0; color: #666; font-size: 1em; }
@@ -142,6 +211,7 @@ $conn->close();
                         <div class="item-info">
                             <p><strong>Item Name:</strong> <?php echo htmlspecialchars($item_details['item_name']); ?></p>
                             <p><strong>Item ID:</strong> <?php echo htmlspecialchars($item_details['item_id']); ?></p>
+                            <p><strong>Current Status:</strong> <?php echo htmlspecialchars($latest_progress); ?></p>
                         </div>
                     </div>
 

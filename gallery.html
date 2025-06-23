@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallery - Legasi Futura</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .page-hero {
+            background-image: url('img/oil.png'); /* You might want a different image */
+        }
+        .gallery-card img {
+            transition: transform 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-white text-black">
+
+    <header id="main-header" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-black">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <a href="index.html" class="flex items-center space-x-2">
+                    <img src="img/logo.png" alt="Legasi Futura Logo" class="h-10">
+                </a>
+                <nav class="hidden lg:flex items-center space-x-6">
+                    <a href="index.html" class="text-white/90 uppercase text-sm font-medium tracking-wider transition-colors duration-300 hover:text-white">Home</a>
+                    <div class="relative group">
+                        <button class="flex items-center space-x-1 text-white/90 uppercase text-sm font-medium tracking-wider transition-colors duration-300 hover:text-white">
+                            <span>Who We Are</span>
+                            <svg class="w-4 h-4 transition-transform duration-300 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                        <div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-black/80 backdrop-blur-sm rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 invisible group-hover:visible pt-2 pb-2">
+                            <a href="who-we-are.html" class="block w-full text-left px-4 py-2 text-sm text-white/90 hover:bg-gray-700/50 hover:text-white">Overview</a>
+                            <a href="vision-mission.html" class="block w-full text-left px-4 py-2 text-sm text-white/90 hover:bg-gray-700/50 hover:text-white">Vision & Mission</a>
+                            <a href="policies.html" class="block w-full text-left px-4 py-2 text-sm text-white/90 hover:bg-gray-700/50 hover:text-white">Our Policies</a>
+                            <a href="cert.html" class="block w-full text-left px-4 py-2 text-sm text-white/90 hover:bg-gray-700/50 hover:text-white">Certification</a>
+                            <a href="track-record.html" class="block w-full text-left px-4 py-2 text-sm text-white/90 hover:bg-gray-700/50 hover:text-white">Track Record</a>
+                        </div>
+                    </div>
+                    <div class="relative group">
+                        <button class="flex items-center space-x-1 text-white/90 uppercase text-sm font-medium tracking-wider transition-colors duration-300 hover:text-white">
+                            <span>What We Do</span>
+                            <svg class="w-4 h-4 transition-transform duration-300 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                        <div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-black/80 backdrop-blur-sm rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 invisible group-hover:visible pt-2 pb-2">
+                            <a href="what-we-do.html" class="block w-full text-left px-4 py-2 text-sm text-white/90 hover:bg-gray-700/50 hover:text-white">Overview</a>
+                            <a href="gallery.html" class="block w-full text-left px-4 py-2 text-sm text-white/90 hover:bg-gray-700/50 hover:text-white">Gallery</a>
+                        </div>
+                    </div>
+                    <a href="contact-us.html" class="text-white/90 uppercase text-sm font-medium tracking-wider transition-colors duration-300 hover:text-white">Contact Us</a>
+                    <a href="career-internship.html" class="text-white/90 uppercase text-sm font-medium tracking-wider transition-colors duration-300 hover:text-white">Career / Internship</a>
+                    <button class="text-white/90 hover:text-white transition-colors duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    </button>
+                </nav>
+                <div class="lg:hidden flex items-center space-x-4">
+                     <button class="text-white/90 hover:text-white transition-colors duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    </button>
+                    <button id="burger-menu" class="text-white focus:outline-none">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div id="mobile-menu" class="hidden lg:hidden fixed inset-0 bg-gray-900/95 backdrop-blur-md z-40 pt-24">
+        <nav class="flex flex-col items-center space-y-8">
+            <a href="index.html" class="text-white/90 uppercase text-lg font-medium tracking-wider transition-colors duration-300 hover:text-white">Home</a>
+            <a href="who-we-are.html" class="text-white/90 uppercase text-lg font-medium tracking-wider transition-colors duration-300 hover:text-white">Who We Are</a>
+            <div class="-mt-6 pl-4">
+                <a href="who-we-are.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Overview</a><br>
+                <a href="vision-mission.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Vision & Mission</a><br>
+                <a href="policies.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Our Policies</a><br>
+                <a href="cert.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Certification</a><br>
+                <a href="track-record.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Track Record</a>
+            </div>
+            <a href="what-we-do.html" class="text-white/90 uppercase text-lg font-medium tracking-wider transition-colors duration-300 hover:text-white">What We Do</a>
+            <div class="-mt-6 pl-4">
+                <a href="what-we-do.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Overview</a><br>
+                <a href="gallery.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Gallery</a>
+            </div>
+            <a href="contact-us.html" class="text-white/90 uppercase text-lg font-medium tracking-wider transition-colors duration-300 hover:text-white">Contact Us</a>
+            <a href="career-internship.html" class="text-white/90 uppercase text-lg font-medium tracking-wider transition-colors duration-300 hover:text-white">Career / Internship</a>
+        </nav>
+    </div>
+
+    <div id="main-container">
+        <main class="pt-32 pb-20">
+            
+            <section id="project-gallery" class="py-20 bg-gray-50">
+                <div class="container mx-auto px-6">
+                    <h2 class="text-3xl font-bold text-center text-gray-800 mb-12">
+                        Project Gallery
+                    </h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+                        <div class="gallery-card" data-gallery-id="project1">
+                            <div class="relative overflow-hidden rounded-lg shadow-lg cursor-pointer group">
+                                <img src="Test" alt="Test" class="w-full h-72 object-cover group-hover:scale-105">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                                <div class="absolute bottom-0 left-0 p-4">
+                                    <h3 class="text-white text-xl font-bold">Test</h3>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="gallery-card" data-gallery-id="project2">
+                            <div class="relative overflow-hidden rounded-lg shadow-lg cursor-pointer group">
+                                <img src="Test" alt="Test" class="w-full h-72 object-cover group-hover:scale-105">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                                <div class="absolute bottom-0 left-0 p-4">
+                                    <h3 class="text-white text-xl font-bold">Test2</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="event-gallery" class="py-20 bg-white">
+                <div class="container mx-auto px-6">
+                    <h2 class="text-3xl font-bold text-center text-gray-800 mb-12">
+                        Event Gallery
+                    </h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+                        <div class="gallery-card" data-gallery-id="event2">
+                            <div class="relative overflow-hidden rounded-lg shadow-lg cursor-pointer group">
+                                <img src="img/gallery/event/sport/sport4.jpeg" alt="Smart Muslim Sports Day 2024" class="w-full h-72 object-cover group-hover:scale-105">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                                <div class="absolute bottom-0 left-0 p-4">
+                                    <h3 class="text-white text-xl font-bold">Smart Muslim Sports Day 2024</h3>
+                                    <p class="text-white/90 text-sm">1 October 2024</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="gallery-card" data-gallery-id="event1">
+                            <div class="relative overflow-hidden rounded-lg shadow-lg cursor-pointer group">
+                                <img src="img/gallery/event/curtin_career/career1.jpeg" alt="Curtin Career Day 2024" class="w-full h-72 object-cover group-hover:scale-105">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                                <div class="absolute bottom-0 left-0 p-4">
+                                    <h3 class="text-white text-xl font-bold">Curtin Career Day 2024</h3>
+                                    <p class="text-white/90 text-sm">13 - 14 September 2024</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            
+        </main>
+
+        <footer class="bg-gray-800 text-white py-12">
+            <div class="container mx-auto px-6">
+                <div class="text-center md:text-left">
+                    <div class="mb-6 md:mb-0">
+                        <img src="img/logo.png" alt="Legasi Futura Logo" class="h-10 mx-auto md:mx-0">
+                        <p class="text-sm text-gray-400 mt-4">1st Floor, Lot 2161 Block 5,</p>
+                        <p class="text-sm text-gray-400">Jalan Saberkas Utama, Jalan Pujut-Lutong,</p>
+                        <p class="text-sm text-gray-400">98000 Miri, Sarawak, Malaysia.</p>
+                        <div class="flex space-x-4 mt-4 justify-center md:justify-start">
+                            <a href="https://www.linkedin.com/company/legasifutura/" class="text-gray-400 hover:text-white transition-colors duration-300">
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" clip-rule="evenodd"/></svg>
+                            </a>
+                            <a href="https://www.facebook.com/p/Legasi-Futura-100094370892508/" class="text-gray-400 hover:text-white transition-colors duration-300">
+                               <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"/></svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+        <div class="text-center text-white text-sm py-6 bg-black">
+            &copy; 2025 Legasi Futura Sdn. Bhd. All rights reserved.
+        </div>
+    </div>
+
+    <a href="https://wa.me/60138626042" class="float" target="_blank">
+        <i class="fa fa-whatsapp my-float"></i>
+    </a>
+    <a id="back-to-top-btn" href="#" class="hidden fixed bottom-28 right-10 bg-blue-900 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition-all duration-300 z-50">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
+    </a>
+
+    <div id="gallery-modal" class="hidden fixed inset-0 bg-black bg-opacity-80 z-[100] flex items-center justify-center p-4 transition-opacity duration-300">
+        <div class="bg-white rounded-lg shadow-2xl w-full max-w-5xl max-h-[90vh] flex flex-col md:flex-row">
+            
+            <div class="w-full md:w-3/5 h-64 md:h-full relative bg-black rounded-t-lg md:rounded-l-lg md:rounded-t-none">
+                <div id="modal-slider" class="w-full h-full">
+                    </div>
+                <button id="slider-prev" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/80 transition-colors text-lg leading-none">&lt;</button>
+                <button id="slider-next" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/80 transition-colors text-lg leading-none">&gt;</button>
+            </div>
+
+            <div class="w-full md:w-2/5 p-6 flex flex-col flex-grow overflow-y-auto">
+                <h3 id="modal-title" class="text-2xl font-bold text-gray-900"></h3>
+                <p id="modal-date" class="text-sm text-gray-500 mt-1 mb-4"></p>
+                <p id="modal-description" class="text-gray-700"></p>
+            </div>
+        </div>
+        <button id="close-gallery-modal" class="absolute top-4 right-4 text-white text-3xl font-light hover:text-gray-300">&times;</button>
+    </div>
+
+    <script>
+        const burgerMenuBtn = document.getElementById('burger-menu');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mainHeader = document.getElementById('main-header');
+        const backToTopBtn = document.getElementById('back-to-top-btn');
+
+        burgerMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+        
+        let lastScrollY = window.scrollY;
+        window.addEventListener('scroll', () => {
+            const currentScrollY = window.scrollY;
+            if (currentScrollY > lastScrollY && currentScrollY > 150) {
+                mainHeader.classList.add('-translate-y-full');
+            } else {
+                mainHeader.classList.remove('-translate-y-full');
+            }
+            if (currentScrollY > 50) {
+                mainHeader.classList.add('bg-black/80');
+                mainHeader.classList.remove('bg-black/30');
+            } else {
+                mainHeader.classList.add('bg-black/30');
+                mainHeader.classList.remove('bg-black/80');
+            }
+            lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY; 
+            if (backToTopBtn) {
+                if (window.scrollY > 300) {
+                    backToTopBtn.classList.remove('hidden');
+                } else {
+                    backToTopBtn.classList.add('hidden');
+                }
+            }
+        });
+
+        if (backToTopBtn) {
+            backToTopBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+        }
+
+        const galleryData = {
+            event1: {
+                title: 'Career Day 2024 at Curtin University',
+                date: 'May 6-9, 2024',
+                description: 'We had an incredible time connecting with talented students, graduates and impressive companies at the Curtin University Malaysia Careers Fair last Friday and Saturday. 🎓✨\n\nIt was great to see so much enthusiasm and passion for the future! We look forward to exploring opportunities with aspiring young professionals ready to make their mark in the industry.\n\nThank you to everyone who visited our booth and engaged with us. Together, building the future ! 💼💡',
+                images: [
+                    'img/gallery/event/curtin_career/career1.jpeg',
+                    'img/gallery/event/curtin_career/career2.jpeg',
+                    'img/gallery/event/curtin_career/career3.jpeg',
+                    'img/gallery/event/curtin_career/career4.jpeg',
+                    'img/gallery/event/curtin_career/career5.jpeg',
+                    'img/gallery/event/curtin_career/career6.jpeg',
+                    'img/gallery/event/curtin_career/career7.jpeg',
+                    'img/gallery/event/curtin_career/career8.jpeg'
+                ]
+            },
+            event2: {
+                title: 'Smart Muslim Sports Day 2024',
+                date: 'October 1, 2024',
+                description: 'Legasi Futura Sdn Bhd is honored to have contributed to Smart Muslim Sports Day 2024 at Kelab Rekreasi Petroliam, Lutong, Miri. \n\nSupporting this wonderful initiative and witnessing the excitement it brings to the children and the community brings us immense joy. We are proud to be part of such a meaningful event that promotes both sports and togetherness. ',
+                images: [
+                    'img/gallery/event/sport/sport1.jpeg',
+                    'img/gallery/event/sport/sport2.jpeg',
+                    'img/gallery/event/sport/sport3.jpeg',
+                    'img/gallery/event/sport/sport4.jpeg',
+                    'img/gallery/event/sport/sport5.jpeg',
+                    'img/gallery/event/sport/sport6.jpeg',
+                    'img/gallery/event/sport/sport7.jpeg'
+                ]
+            },
+            project1: {
+                title: 'test1',
+                date: '', 
+                description: 'test1',
+                images: [
+                  
+                ]
+            },
+            project2: {
+                title: 'test2',
+                date: '',
+                description: 'test2',
+                images: [
+                    
+                ]
+            }
+        };
+
+        const galleryCards = document.querySelectorAll('.gallery-card');
+        const modal = document.getElementById('gallery-modal');
+        const closeModalBtn = document.getElementById('close-gallery-modal');
+        const slider = document.getElementById('modal-slider');
+        const modalTitle = document.getElementById('modal-title');
+        const modalDate = document.getElementById('modal-date');
+        const modalDescription = document.getElementById('modal-description');
+        const prevBtn = document.getElementById('slider-prev');
+        const nextBtn = document.getElementById('slider-next');
+
+        let currentImages = [];
+        let currentSlideIndex = 0;
+
+        function showSlide(index) {
+            const slides = slider.querySelectorAll('img');
+            slides.forEach((slide, i) => {
+                slide.classList.toggle('hidden', i !== index);
+            });
+            prevBtn.style.display = slides.length > 1 ? 'block' : 'none';
+            nextBtn.style.display = slides.length > 1 ? 'block' : 'none';
+        }
+
+        function populateModal(itemId) {
+            const itemData = galleryData[itemId];
+            if (!itemData) return;
+
+            currentImages = itemData.images;
+            currentSlideIndex = 0;
+
+            modalTitle.textContent = itemData.title;
+            modalDescription.innerHTML = itemData.description.replace(/\n/g, '<br>');
+            modalDate.style.display = itemData.date ? 'block' : 'none';
+            modalDate.textContent = itemData.date;
+
+            slider.innerHTML = ''; // Clear previous images
+            currentImages.forEach((src, index) => {
+                const img = document.createElement('img');
+                img.src = src;
+                img.alt = `${itemData.title} - Image ${index + 1}`;
+                img.className = 'w-full h-full object-contain';
+                if (index !== 0) img.classList.add('hidden');
+                slider.appendChild(img);
+            });
+
+            showSlide(currentSlideIndex);
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        galleryCards.forEach(card => card.addEventListener('click', () => populateModal(card.dataset.galleryId)));
+        
+        function hideModal() {
+            modal.classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        closeModalBtn.addEventListener('click', hideModal);
+        modal.addEventListener('click', (e) => e.target.id === 'gallery-modal' && hideModal());
+        document.addEventListener('keydown', (e) => e.key === 'Escape' && !modal.classList.contains('hidden') && hideModal());
+        nextBtn.addEventListener('click', () => { currentSlideIndex = (currentSlideIndex + 1) % currentImages.length; showSlide(currentSlideIndex); });
+        prevBtn.addEventListener('click', () => { currentSlideIndex = (currentSlideIndex - 1 + currentImages.length) % currentImages.length; showSlide(currentSlideIndex); });
+    </script>
+
+</body>
+</html>

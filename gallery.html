@@ -14,9 +14,6 @@
         body {
             font-family: 'Inter', sans-serif;
         }
-        .page-hero {
-            background-image: url('img/oil.png'); /* You might want a different image */
-        }
         .gallery-card img {
             transition: transform 0.3s ease-in-out;
         }
@@ -63,7 +60,7 @@
                 </nav>
                 <div class="lg:hidden flex items-center space-x-4">
                      <button class="text-white/90 hover:text-white transition-colors duration-300">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                     </button>
                     <button id="burger-menu" class="text-white focus:outline-none">
                         <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -80,16 +77,16 @@
             <a href="index.html" class="text-white/90 uppercase text-lg font-medium tracking-wider transition-colors duration-300 hover:text-white">Home</a>
             <a href="who-we-are.html" class="text-white/90 uppercase text-lg font-medium tracking-wider transition-colors duration-300 hover:text-white">Who We Are</a>
             <div class="-mt-6 pl-4">
-                <a href="who-we-are.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Overview</a><br>
-                <a href="vision-mission.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Vision & Mission</a><br>
-                <a href="policies.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Our Policies</a><br>
-                <a href="cert.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Certification</a><br>
-                <a href="track-record.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Track Record</a>
+                <a href="who-we-are.html" class="block text-center text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Overview</a><br>
+                <a href="vision-mission.html" class="block text-center text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Vision & Mission</a><br>
+                <a href="policies.html" class="block text-center text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Our Policies</a><br>
+                <a href="cert.html" class="block text-center text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Certification</a><br>
+                <a href="track-record.html" class="block text-center text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Track Record</a>
             </div>
             <a href="what-we-do.html" class="text-white/90 uppercase text-lg font-medium tracking-wider transition-colors duration-300 hover:text-white">What We Do</a>
             <div class="-mt-6 pl-4">
-                <a href="what-we-do.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Overview</a><br>
-                <a href="gallery.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Gallery</a>
+                <a href="what-we-do.html" class="block text-center text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Overview</a><br>
+                <a href="gallery.html" class="block text-center text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Gallery</a>
             </div>
             <a href="contact-us.html" class="text-white/90 uppercase text-lg font-medium tracking-wider transition-colors duration-300 hover:text-white">Contact Us</a>
             <a href="career-internship.html" class="text-white/90 uppercase text-lg font-medium tracking-wider transition-colors duration-300 hover:text-white">Career / Internship</a>
@@ -104,26 +101,76 @@
                     <h2 class="text-3xl font-bold text-center text-gray-800 mb-12">
                         Project Gallery
                     </h2>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-                        <div class="gallery-card" data-gallery-id="project1">
-                            <div class="relative overflow-hidden rounded-lg shadow-lg cursor-pointer group">
-                                <img src="Test" alt="Test" class="w-full h-72 object-cover group-hover:scale-105">
-                                <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-                                <div class="absolute bottom-0 left-0 p-4">
-                                    <h3 class="text-white text-xl font-bold">Test</h3>
+                    <div class="relative">
+                        <div id="project-slider-container" class="overflow-hidden">
+                            <div id="project-slider-track" class="flex transition-transform duration-500 ease-in-out">
+                                <div class="gallery-card w-full sm:w-1/2 md:w-1/3 lg:w-1/4 flex-shrink-0 p-4" data-gallery-id="project1">
+                                    <div class="relative overflow-hidden rounded-lg shadow-lg cursor-pointer group">
+                                        <img src="img/gallery/project/1.png" alt="Intergal DBB Injection Valve" class="w-full h-72 object-cover group-hover:scale-105">
+                                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                                        <div class="absolute bottom-0 left-0 p-4">
+                                            <h3 class="text-white text-xl font-bold">Delivery of Intergal DBB Injection Valve</h3>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
 
-                        <div class="gallery-card" data-gallery-id="project2">
-                            <div class="relative overflow-hidden rounded-lg shadow-lg cursor-pointer group">
-                                <img src="Test" alt="Test" class="w-full h-72 object-cover group-hover:scale-105">
-                                <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-                                <div class="absolute bottom-0 left-0 p-4">
-                                    <h3 class="text-white text-xl font-bold">Test2</h3>
+                                <div class="gallery-card w-full sm:w-1/2 md:w-1/3 lg:w-1/4 flex-shrink-0 p-4" data-gallery-id="project2">
+                                    <div class="relative overflow-hidden rounded-lg shadow-lg cursor-pointer group">
+                                        <img src="img/gallery/project/3.png" alt="DBB Valve" class="w-full h-72 object-cover group-hover:scale-105">
+                                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                                        <div class="absolute bottom-0 left-0 p-4">
+                                            <h3 class="text-white text-xl font-bold">Delivery of Double Block and Bleed Valce</h3>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="gallery-card w-full sm:w-1/2 md:w-1/3 lg:w-1/4 flex-shrink-0 p-4" data-gallery-id="project3">
+                                    <div class="relative overflow-hidden rounded-lg shadow-lg cursor-pointer group">
+                                        <img src="img/gallery/project/4.png" alt="RTJ Flanges" class="w-full h-72 object-cover group-hover:scale-105">
+                                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                                        <div class="absolute bottom-0 left-0 p-4">
+                                            <h3 class="text-white text-xl font-bold">Delivery of RTJ Flanges</h3>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="gallery-card w-full sm:w-1/2 md:w-1/3 lg:w-1/4 flex-shrink-0 p-4" data-gallery-id="project4">
+                                    <div class="relative overflow-hidden rounded-lg shadow-lg cursor-pointer group">
+                                        <img src="img/gallery/project/5.png" alt="Retrival Tools & Service Valve" class="w-full h-72 object-cover group-hover:scale-105">
+                                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                                        <div class="absolute bottom-0 left-0 p-4">
+                                            <h3 class="text-white text-xl font-bold">Delivery of Retirval Tools & Service Valve</h3>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="gallery-card w-full sm:w-1/2 md:w-1/3 lg:w-1/4 flex-shrink-0 p-4" data-gallery-id="project5">
+                                    <div class="relative overflow-hidden rounded-lg shadow-lg cursor-pointer group">
+                                        <img src="img/gallery/project/6.png" alt="DBB" class="w-full h-72 object-cover group-hover:scale-105">
+                                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                                        <div class="absolute bottom-0 left-0 p-4">
+                                            <h3 class="text-white text-xl font-bold">Delivery of DBB</h3>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="gallery-card w-full sm:w-1/2 md:w-1/3 lg:w-1/4 flex-shrink-0 p-4" data-gallery-id="project6">
+                                    <div class="relative overflow-hidden rounded-lg shadow-lg cursor-pointer group">
+                                        <img src="img/gallery/project/2.png" alt="Intergral DBB Injection Valve" class="w-full h-72 object-cover group-hover:scale-105">
+                                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                                        <div class="absolute bottom-0 left-0 p-4">
+                                            <h3 class="text-white text-xl font-bold">Delivery of Intergral DBB Injection Valve</h3>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                        <button id="project-slider-prev" class="absolute left-0 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/80 transition-colors text-lg leading-none z-10">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                        </button>
+                        <button id="project-slider-next" class="absolute right-0 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/80 transition-colors text-lg leading-none z-10">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                        </button>
                     </div>
                 </div>
             </section>
@@ -134,17 +181,6 @@
                         Event Gallery
                     </h2>
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-                        <div class="gallery-card" data-gallery-id="event2">
-                            <div class="relative overflow-hidden rounded-lg shadow-lg cursor-pointer group">
-                                <img src="img/gallery/event/sport/sport4.jpeg" alt="Smart Muslim Sports Day 2024" class="w-full h-72 object-cover group-hover:scale-105">
-                                <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-                                <div class="absolute bottom-0 left-0 p-4">
-                                    <h3 class="text-white text-xl font-bold">Smart Muslim Sports Day 2024</h3>
-                                    <p class="text-white/90 text-sm">1 October 2024</p>
-                                </div>
-                            </div>
-                        </div>
-
                         <div class="gallery-card" data-gallery-id="event1">
                             <div class="relative overflow-hidden rounded-lg shadow-lg cursor-pointer group">
                                 <img src="img/gallery/event/curtin_career/career1.jpeg" alt="Curtin Career Day 2024" class="w-full h-72 object-cover group-hover:scale-105">
@@ -155,10 +191,19 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="gallery-card" data-gallery-id="event2">
+                            <div class="relative overflow-hidden rounded-lg shadow-lg cursor-pointer group">
+                                <img src="img/gallery/event/peryatim/2.png" alt="Peryatim" class="w-full h-72 object-cover group-hover:scale-105">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                                <div class="absolute bottom-0 left-0 p-4">
+                                    <h3 class="text-white text-xl font-bold">HSE Program: Health & Wellbeing Activity with Peryatim Miri, Sarawak. </h3>
+                                    <p class="text-white/90 text-sm">1 May 2024</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
-
             
         </main>
 
@@ -199,7 +244,7 @@
             
             <div class="w-full md:w-3/5 h-64 md:h-full relative bg-black rounded-t-lg md:rounded-l-lg md:rounded-t-none">
                 <div id="modal-slider" class="w-full h-full">
-                    </div>
+                </div>
                 <button id="slider-prev" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/80 transition-colors text-lg leading-none">&lt;</button>
                 <button id="slider-next" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/80 transition-colors text-lg leading-none">&gt;</button>
             </div>
@@ -214,159 +259,273 @@
     </div>
 
     <script>
-        const burgerMenuBtn = document.getElementById('burger-menu');
-        const mobileMenu = document.getElementById('mobile-menu');
-        const mainHeader = document.getElementById('main-header');
-        const backToTopBtn = document.getElementById('back-to-top-btn');
+        document.addEventListener('DOMContentLoaded', () => {
+            const burgerMenuBtn = document.getElementById('burger-menu');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mainHeader = document.getElementById('main-header');
+            const backToTopBtn = document.getElementById('back-to-top-btn');
 
-        burgerMenuBtn.addEventListener('click', () => {
-            mobileMenu.classList.toggle('hidden');
-        });
-        
-        let lastScrollY = window.scrollY;
-        window.addEventListener('scroll', () => {
-            const currentScrollY = window.scrollY;
-            if (currentScrollY > lastScrollY && currentScrollY > 150) {
-                mainHeader.classList.add('-translate-y-full');
-            } else {
-                mainHeader.classList.remove('-translate-y-full');
-            }
-            if (currentScrollY > 50) {
-                mainHeader.classList.add('bg-black/80');
-                mainHeader.classList.remove('bg-black/30');
-            } else {
-                mainHeader.classList.add('bg-black/30');
-                mainHeader.classList.remove('bg-black/80');
-            }
-            lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY; 
-            if (backToTopBtn) {
-                if (window.scrollY > 300) {
-                    backToTopBtn.classList.remove('hidden');
-                } else {
-                    backToTopBtn.classList.add('hidden');
-                }
-            }
-        });
-
-        if (backToTopBtn) {
-            backToTopBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
+            if (burgerMenuBtn && mobileMenu) {
+                burgerMenuBtn.addEventListener('click', () => {
+                    mobileMenu.classList.toggle('hidden');
                 });
-            });
-        }
-
-        const galleryData = {
-            event1: {
-                title: 'Career Day 2024 at Curtin University',
-                date: 'May 6-9, 2024',
-                description: 'We had an incredible time connecting with talented students, graduates and impressive companies at the Curtin University Malaysia Careers Fair last Friday and Saturday. 🎓✨\n\nIt was great to see so much enthusiasm and passion for the future! We look forward to exploring opportunities with aspiring young professionals ready to make their mark in the industry.\n\nThank you to everyone who visited our booth and engaged with us. Together, building the future ! 💼💡',
-                images: [
-                    'img/gallery/event/curtin_career/career1.jpeg',
-                    'img/gallery/event/curtin_career/career2.jpeg',
-                    'img/gallery/event/curtin_career/career3.jpeg',
-                    'img/gallery/event/curtin_career/career4.jpeg',
-                    'img/gallery/event/curtin_career/career5.jpeg',
-                    'img/gallery/event/curtin_career/career6.jpeg',
-                    'img/gallery/event/curtin_career/career7.jpeg',
-                    'img/gallery/event/curtin_career/career8.jpeg'
-                ]
-            },
-            event2: {
-                title: 'Smart Muslim Sports Day 2024',
-                date: 'October 1, 2024',
-                description: 'Legasi Futura Sdn Bhd is honored to have contributed to Smart Muslim Sports Day 2024 at Kelab Rekreasi Petroliam, Lutong, Miri. \n\nSupporting this wonderful initiative and witnessing the excitement it brings to the children and the community brings us immense joy. We are proud to be part of such a meaningful event that promotes both sports and togetherness. ',
-                images: [
-                    'img/gallery/event/sport/sport1.jpeg',
-                    'img/gallery/event/sport/sport2.jpeg',
-                    'img/gallery/event/sport/sport3.jpeg',
-                    'img/gallery/event/sport/sport4.jpeg',
-                    'img/gallery/event/sport/sport5.jpeg',
-                    'img/gallery/event/sport/sport6.jpeg',
-                    'img/gallery/event/sport/sport7.jpeg'
-                ]
-            },
-            project1: {
-                title: 'test1',
-                date: '', 
-                description: 'test1',
-                images: [
-                  
-                ]
-            },
-            project2: {
-                title: 'test2',
-                date: '',
-                description: 'test2',
-                images: [
-                    
-                ]
             }
-        };
+            
+            if (mainHeader) {
+                let lastScrollY = window.scrollY;
+                window.addEventListener('scroll', () => {
+                    const currentScrollY = window.scrollY;
+                    if (currentScrollY > lastScrollY && currentScrollY > 150) {
+                        mainHeader.classList.add('-translate-y-full');
+                    } else {
+                        mainHeader.classList.remove('-translate-y-full');
+                    }
+                    if (currentScrollY > 50) {
+                        mainHeader.classList.add('bg-black/80');
+                        mainHeader.classList.remove('bg-black/30');
+                    } else {
+                        mainHeader.classList.add('bg-black/30');
+                        mainHeader.classList.remove('bg-black/80');
+                    }
+                    lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY; 
+                    
+                    if (backToTopBtn) {
+                        if (window.scrollY > 300) {
+                            backToTopBtn.classList.remove('hidden');
+                        } else {
+                            backToTopBtn.classList.add('hidden');
+                        }
+                    }
+                });
+            }
 
-        const galleryCards = document.querySelectorAll('.gallery-card');
-        const modal = document.getElementById('gallery-modal');
-        const closeModalBtn = document.getElementById('close-gallery-modal');
-        const slider = document.getElementById('modal-slider');
-        const modalTitle = document.getElementById('modal-title');
-        const modalDate = document.getElementById('modal-date');
-        const modalDescription = document.getElementById('modal-description');
-        const prevBtn = document.getElementById('slider-prev');
-        const nextBtn = document.getElementById('slider-next');
+            if (backToTopBtn) {
+                backToTopBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
+                });
+            }
 
-        let currentImages = [];
-        let currentSlideIndex = 0;
+            // --- REVISED PROJECT GALLERY SLIDER LOGIC ---
+            const projectSliderTrack = document.getElementById('project-slider-track');
+            const projectSliderPrevBtn = document.getElementById('project-slider-prev');
+            const projectSliderNextBtn = document.getElementById('project-slider-next');
+            const projectCards = document.querySelectorAll('#project-slider-track .gallery-card');
 
-        function showSlide(index) {
-            const slides = slider.querySelectorAll('img');
-            slides.forEach((slide, i) => {
-                slide.classList.toggle('hidden', i !== index);
-            });
-            prevBtn.style.display = slides.length > 1 ? 'block' : 'none';
-            nextBtn.style.display = slides.length > 1 ? 'block' : 'none';
-        }
+            if (projectSliderTrack && projectCards.length > 0) {
+                let currentItemIndex = 0;
+                let itemsPerView = 1;
 
-        function populateModal(itemId) {
-            const itemData = galleryData[itemId];
-            if (!itemData) return;
+                function getItemsPerView() {
+                    // Corresponds to Tailwind breakpoints: sm: 640, md: 768, lg: 1024
+                    if (window.innerWidth >= 1024) return 4;
+                    if (window.innerWidth >= 768) return 3;
+                    if (window.innerWidth >= 640) return 2;
+                    return 1;
+                }
 
-            currentImages = itemData.images;
-            currentSlideIndex = 0;
+                function updateSliderView() {
+                    itemsPerView = getItemsPerView();
+                    const maxIndex = projectCards.length > itemsPerView ? projectCards.length - itemsPerView : 0;
 
-            modalTitle.textContent = itemData.title;
-            modalDescription.innerHTML = itemData.description.replace(/\n/g, '<br>');
-            modalDate.style.display = itemData.date ? 'block' : 'none';
-            modalDate.textContent = itemData.date;
+                    // Clamp index after resize to prevent going out of bounds
+                    if (currentItemIndex > maxIndex) {
+                        currentItemIndex = maxIndex;
+                    }
 
-            slider.innerHTML = ''; // Clear previous images
-            currentImages.forEach((src, index) => {
-                const img = document.createElement('img');
-                img.src = src;
-                img.alt = `${itemData.title} - Image ${index + 1}`;
-                img.className = 'w-full h-full object-contain';
-                if (index !== 0) img.classList.add('hidden');
-                slider.appendChild(img);
-            });
+                    // Calculate the translation based on the width of a single item
+                    const singleItemWidthPercent = 100 / itemsPerView;
+                    const offset = -currentItemIndex * singleItemWidthPercent;
+                    projectSliderTrack.style.transform = `translateX(${offset}%)`;
 
-            showSlide(currentSlideIndex);
-            modal.classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
-        }
+                    // Update button visibility
+                    projectSliderPrevBtn.style.display = currentItemIndex > 0 ? 'block' : 'none';
+                    projectSliderNextBtn.style.display = currentItemIndex < maxIndex ? 'block' : 'none';
+                }
 
-        galleryCards.forEach(card => card.addEventListener('click', () => populateModal(card.dataset.galleryId)));
-        
-        function hideModal() {
-            modal.classList.add('hidden');
-            document.body.style.overflow = '';
-        }
+                projectSliderPrevBtn.addEventListener('click', () => {
+                    if (currentItemIndex > 0) {
+                        currentItemIndex--;
+                        updateSliderView();
+                    }
+                });
 
-        closeModalBtn.addEventListener('click', hideModal);
-        modal.addEventListener('click', (e) => e.target.id === 'gallery-modal' && hideModal());
-        document.addEventListener('keydown', (e) => e.key === 'Escape' && !modal.classList.contains('hidden') && hideModal());
-        nextBtn.addEventListener('click', () => { currentSlideIndex = (currentSlideIndex + 1) % currentImages.length; showSlide(currentSlideIndex); });
-        prevBtn.addEventListener('click', () => { currentSlideIndex = (currentSlideIndex - 1 + currentImages.length) % currentImages.length; showSlide(currentSlideIndex); });
+                projectSliderNextBtn.addEventListener('click', () => {
+                    const maxIndex = projectCards.length > itemsPerView ? projectCards.length - itemsPerView : 0;
+                    if (currentItemIndex < maxIndex) {
+                        currentItemIndex++;
+                        updateSliderView();
+                    }
+                });
+                
+                // Initial setup and resize handling
+                window.addEventListener('resize', updateSliderView);
+                updateSliderView(); // First run on page load
+
+            } else if (projectSliderPrevBtn) {
+                // Hide buttons if slider is empty
+                projectSliderPrevBtn.style.display = 'none';
+                projectSliderNextBtn.style.display = 'none';
+            }
+
+            // --- END OF REVISED SLIDER LOGIC ---
+
+            const galleryData = {
+                event1: {
+                    title: 'Career Day 2024 at Curtin University',
+                    date: '13 - 14 September 2024',
+                    description: 'We had an incredible time connecting with talented students, graduates and impressive companies at the Curtin University Malaysia Careers Fair last Friday and Saturday. 🎓✨\n\nIt was great to see so much enthusiasm and passion for the future! We look forward to exploring opportunities with aspiring young professionals ready to make their mark in the industry.\n\nThank you to everyone who visited our booth and engaged with us. Together, building the future ! 💼💡',
+                    images: [
+                        'img/gallery/event/curtin_career/career1.jpeg',
+                        'img/gallery/event/curtin_career/career2.jpeg',
+                        'img/gallery/event/curtin_career/career3.jpeg',
+                        'img/gallery/event/curtin_career/career4.jpeg',
+                        'img/gallery/event/curtin_career/career5.jpeg',
+                        'img/gallery/event/curtin_career/career6.jpeg',
+                        'img/gallery/event/curtin_career/career7.jpeg',
+                        'img/gallery/event/curtin_career/career8.jpeg'
+                    ]
+                },
+                event2: {
+                    title: 'HSE Program: Health & Wellbeing Activity with Peryatim Miri, Sarawak. ',
+                    date: 'May 1, 2024',
+                    description: 'To promote compassion, emotional wellbeing, and a sense of community responsibility among employees as part of our holistic HSE culture.',
+                    images: [
+                        'img/gallery/event/peryatim/1.png',
+                        'img/gallery/event/peryatim/2.png', 
+                        'img/gallery/event/peryatim/3.png',
+                        'img/gallery/event/peryatim/4.png',
+                        'img/gallery/event/peryatim/5.png',
+                        'img/gallery/event/peryatim/6.png',
+                        'img/gallery/event/peryatim/7.png',
+                        'img/gallery/event/peryatim/8.png'
+                    ]
+                },
+                project1: {
+                    title: 'Delivery of Intergal DBB Injection Valve',
+                    date: '', 
+                    description: 'DN40X15-1500LB \nDN50X15-1500LB',
+                    images: [
+                        'img/gallery/project/1.png'
+                    ]
+                },
+                project2: {
+                    title: 'Delivery of Double Block and Bleed (DBB) Valve',
+                    date: '',
+                    description: 'DN50X15-1500LB',
+                    images: [
+                        'img/gallery/project/3.png'
+                    ]
+                },
+                project3: {
+                    title: 'Delivery of RTJ Flanges',
+                    date: '',
+                    description: 'HP 2” 9/1500# RTJ Flanged\nAccess Fitting for Corrosion Coupon',
+                    images: [
+                        'img/gallery/project/4.png'
+                    ]
+                },
+                project4: {
+                    title: 'Delivery of Retirval Tools & Service Valve',
+                    date: '',
+                    description: 'RETRIEVAL TOOL, 26", 3600PSI AND SERVICE VALVE, 6000 PSI',
+                    images: [
+                        'img/gallery/project/5.png'
+                    ]
+                },
+                project5: {
+                    title: 'Delivery of DBB',
+                    date: '',
+                    description: 'DN50X15-1500LB',
+                    images: [
+                        'img/gallery/project/6.png'
+                    ]
+                },
+                project6: {
+                    title: 'Delivery of Intergral DBB Injection Valve',
+                    date: '',
+                    description: 'DN50X15-1500LB \n DN100-1500LB',
+                    images: [
+                        'img/gallery/project/6.png'
+                    ]
+                }
+            };
+
+            const galleryCards = document.querySelectorAll('.gallery-card');
+            const modal = document.getElementById('gallery-modal');
+            const closeModalBtn = document.getElementById('close-gallery-modal');
+            const slider = document.getElementById('modal-slider');
+            const modalTitle = document.getElementById('modal-title');
+            const modalDate = document.getElementById('modal-date');
+            const modalDescription = document.getElementById('modal-description');
+            const prevBtn = document.getElementById('slider-prev');
+            const nextBtn = document.getElementById('slider-next');
+
+            if (!modal || !closeModalBtn || !slider || !modalTitle || !modalDate || !modalDescription || !prevBtn || !nextBtn) {
+                console.error("Gallery modal component not found. Aborting gallery script.");
+                return;
+            }
+
+            let currentImages = [];
+            let currentSlideIndex = 0;
+
+            function showSlide(index) {
+                const slides = slider.querySelectorAll('img');
+                if (slides.length === 0) return;
+                slides.forEach((slide, i) => {
+                    slide.classList.toggle('hidden', i !== index);
+                });
+                prevBtn.style.display = slides.length > 1 ? 'block' : 'none';
+                nextBtn.style.display = slides.length > 1 ? 'block' : 'none';
+            }
+
+            function populateModal(itemId) {
+                const itemData = galleryData[itemId];
+                if (!itemData) return;
+
+                currentImages = itemData.images;
+                currentSlideIndex = 0;
+
+                modalTitle.textContent = itemData.title;
+                modalDescription.innerHTML = itemData.description.replace(/\n/g, '<br>');
+                modalDate.style.display = itemData.date ? 'block' : 'none';
+                modalDate.textContent = itemData.date;
+
+                slider.innerHTML = ''; // Clear previous images
+                if (currentImages.length === 0) {
+                     slider.innerHTML = `<div class="w-full h-full flex items-center justify-center text-white/50">No images available.</div>`;
+                } else {
+                    currentImages.forEach((src, index) => {
+                        const img = document.createElement('img');
+                        img.src = src;
+                        img.alt = `${itemData.title} - Image ${index + 1}`;
+                        img.className = 'w-full h-full object-contain';
+                        if (index !== 0) img.classList.add('hidden');
+                        slider.appendChild(img);
+                    });
+                }
+                
+                showSlide(currentSlideIndex);
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+
+            galleryCards.forEach(card => card.addEventListener('click', () => populateModal(card.dataset.galleryId)));
+            
+            function hideModal() {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+
+            closeModalBtn.addEventListener('click', hideModal);
+            modal.addEventListener('click', (e) => e.target.id === 'gallery-modal' && hideModal());
+            document.addEventListener('keydown', (e) => e.key === 'Escape' && !modal.classList.contains('hidden') && hideModal());
+            nextBtn.addEventListener('click', () => { currentSlideIndex = (currentSlideIndex + 1) % currentImages.length; showSlide(currentSlideIndex); });
+            prevBtn.addEventListener('click', () => { currentSlideIndex = (currentSlideIndex - 1 + currentImages.length) % currentImages.length; showSlide(currentSlideIndex); });
+        });
     </script>
 
 </body>

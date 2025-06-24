@@ -48,7 +48,7 @@ switch ($method) {
         // *** NEW ENDPOINT TO GET ALL PROGRESS FOR ONE ITEM ***
         elseif (strpos($path, 'progress/') === 0) {
             $id = substr($path, strlen('progress/'));
-            $stmt = $conn->prepare("SELECT progress, description, date, time FROM progress WHERE item_primary_id = ? ORDER BY date DESC, time DESC");
+            $stmt = $conn->prepare("SELECT progress, description, date, time, image_path FROM progress WHERE item_primary_id = ? ORDER BY date DESC, time DESC");
             $stmt->bind_param("i", $id);
             $stmt->execute();
             $result = $stmt->get_result();
@@ -65,33 +65,51 @@ switch ($method) {
     case 'POST':
         if ($path == 'addItem') {
             $data = json_decode(file_get_contents('php://input'), true);
-            $shareable_id = guuidv4();
-            $stmt = $conn->prepare("INSERT INTO items (shareable_id, item_name, item_id, receipient, eta) VALUES (?, ?, ?, ?, ?)");
-            $stmt->bind_param("sssss", $shareable_id, $data['itemName'], $data['itemId'], $data['receipient'], $data['eta']);
+            $shareable_id = guuidv4(); 
+            $stmt = $conn->prepare("INSERT INTO items (shareable_id, item_name, item_id, client, eta) VALUES (?, ?, ?, ?, ?)");
+            $stmt->bind_param("sssss", $shareable_id, $data['itemName'], $data['itemId'], $data['client'], $data['eta']);
             if ($stmt->execute()) {
                 http_response_code(201);
                 echo json_encode(array("message" => "Item added successfully"));
             } else {
-                http_response_code(500);
+                http_response_code(500); 
                 echo json_encode(array("error" => "Error adding item: " . $stmt->error));
             }
             $stmt->close();
         }
-        break;
+        // Handle item update with potential file upload
+        elseif (strpos($path, 'updateItem/') === 0) {
+            $id = substr($path, strlen('updateItem/'));
+            $data = $_POST;
+            $image_path = null;
 
-    case 'PUT':
-        if (strpos($path, 'editItem/') === 0) {
-            $id = substr($path, strlen('editItem/'));
-            $data = json_decode(file_get_contents('php://input'), true);
+            // Handle file upload
+            if (isset($_FILES['progressImage']) && $_FILES['progressImage']['error'] == 0) {
+                $upload_dir = 'uploads/';
+                if (!is_dir($upload_dir)) {
+                    mkdir($upload_dir, 0755, true);
+                }
+                $file_name = uniqid() . '-' . basename($_FILES['progressImage']['name']);
+                $target_file = $upload_dir . $file_name;
+
+                if (move_uploaded_file($_FILES['progressImage']['tmp_name'], $target_file)) {
+                    $image_path = $target_file;
+                } else {
+                    http_response_code(500);
+                    echo json_encode(array("error" => "Failed to move uploaded file."));
+                    exit;
+                }
+            }
+
             $conn->begin_transaction();
             try {
-                $stmt_item = $conn->prepare("UPDATE items SET item_name = ?, item_id = ?, receipient = ?, eta = ? WHERE id = ?");
-                $stmt_item->bind_param("ssssi", $data['itemName'], $data['itemId'], $data['receipient'], $data['eta'], $id);
+                $stmt_item = $conn->prepare("UPDATE items SET item_name = ?, item_id = ?, client = ?, eta = ? WHERE id = ?");
+                $stmt_item->bind_param("ssssi", $data['itemName'], $data['itemId'], $data['client'], $data['eta'], $id);
                 $stmt_item->execute();
                 $stmt_item->close();
 
-                $stmt_progress = $conn->prepare("INSERT INTO progress (item_primary_id, progress, description, date, time) VALUES (?, ?, ?, ?, ?)");
-                $stmt_progress->bind_param("issss", $id, $data['progress'], $data['description'], $data['date'], $data['time']);
+                $stmt_progress = $conn->prepare("INSERT INTO progress (item_primary_id, progress, description, date, time, image_path) VALUES (?, ?, ?, ?, ?, ?)");
+                $stmt_progress->bind_param("isssss", $id, $data['progress'], $data['description'], $data['date'], $data['time'], $image_path);
                 $stmt_progress->execute();
                 $stmt_progress->close();
                 
@@ -99,10 +117,14 @@ switch ($method) {
                 echo json_encode(array("message" => "Item updated successfully"));
             } catch (mysqli_sql_exception $exception) {
                 $conn->rollback();
+                if ($image_path && file_exists($image_path)) { unlink($image_path); }
                 http_response_code(500);
                 echo json_encode(array("error" => "Database error: " . $exception->getMessage()));
             }
         }
+        break;
+
+    case 'PUT':
         break;
 
     case 'DELETE':

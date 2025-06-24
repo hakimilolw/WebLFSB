@@ -8,7 +8,7 @@ $latest_progress = "Awaiting Progress"; // Default status
 
 if (!empty($shareable_id)) {
     // Fetch the main item details using the shareable ID
-    $stmt = $conn->prepare("SELECT id, item_name, item_id, receipient FROM items WHERE shareable_id = ?");
+    $stmt = $conn->prepare("SELECT id, item_name, item_id, client FROM items WHERE shareable_id = ?");
     $stmt->bind_param("s", $shareable_id);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -19,7 +19,7 @@ if (!empty($shareable_id)) {
 
         // Fetch the progress history for that item using the internal id
         $stmt_progress = $conn->prepare(
-            "SELECT progress, description, date, time FROM progress 
+            "SELECT progress, description, date, time, image_path FROM progress 
              WHERE item_primary_id = ?
              ORDER BY date DESC, time DESC"
         );
@@ -207,8 +207,8 @@ $conn->close();
             <div class="tracking-container">
                 <?php if ($item_details): ?>
                     <div class="tracking-header">
-                        <h2>Hello, <?php echo htmlspecialchars($item_details['receipient']); ?></h2>
-                        <div class="item-info">
+                        <h2>Hello, <?php echo htmlspecialchars($item_details['client']); ?></h2>
+                        <div class="item-info"> 
                             <p><strong>Item Name:</strong> <?php echo htmlspecialchars($item_details['item_name']); ?></p>
                             <p><strong>Item ID:</strong> <?php echo htmlspecialchars($item_details['item_id']); ?></p>
                             <p><strong>Current Status:</strong> <?php echo htmlspecialchars($latest_progress); ?></p>
@@ -234,6 +234,11 @@ $conn->close();
                                         </div>
                                         <h4><?php echo htmlspecialchars($progress['progress']); ?></h4>
                                         <p><?php echo htmlspecialchars($progress['description']); ?></p>
+                                        <?php if (!empty($progress['image_path'])): ?>
+                                            <p style="margin-top: 10px;">
+                                                <a href="#" class="text-blue-600 hover:underline see-image-trigger" data-img-src="<?php echo htmlspecialchars($progress['image_path']); ?>">See Image</a>
+                                            </p>
+                                        <?php endif; ?>
                                     </div>
                                 </li>
                             <?php endforeach; ?>
@@ -269,6 +274,17 @@ $conn->close();
             &copy; 2025 Legasi Futura Sdn. Bhd. All rights reserved.
         </div>
     </div>
+
+    <!-- Image Modal -->
+    <div id="image-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-[100] p-4">
+        <div class="bg-white p-2 rounded-lg shadow-xl max-w-4xl max-h-[90vh] relative">
+            <button id="close-image-modal" class="absolute -top-3 -right-3 bg-gray-700 text-white rounded-full p-2 z-10 hover:bg-black transition-colors duration-200">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <img id="modal-image" src="" class="max-w-full max-h-[85vh]" alt="Progress Image">
+        </div>
+    </div>
+
 
     <a href="https://wa.me/60138626042" class="float" target="_blank">
         <i class="fa fa-whatsapp my-float"></i>
@@ -315,6 +331,44 @@ $conn->close();
             e.preventDefault();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
+
+        // --- Image Modal Logic ---
+        const imageModal = document.getElementById('image-modal');
+        if (imageModal) {
+            const modalImage = document.getElementById('modal-image');
+            const closeImageModalBtn = document.getElementById('close-image-modal');
+            const mainContainer = document.getElementById('main-container');
+
+            const hideImageModal = () => {
+                imageModal.classList.add('hidden');
+                modalImage.src = ''; 
+            };
+
+            mainContainer.addEventListener('click', (e) => {
+                if (e.target.classList.contains('see-image-trigger')) {
+                    e.preventDefault();
+                    const imgSrc = e.target.dataset.imgSrc;
+                    if (imgSrc) {
+                        modalImage.src = imgSrc;
+                        imageModal.classList.remove('hidden');
+                    }
+                }
+            });
+
+            closeImageModalBtn.addEventListener('click', hideImageModal);
+
+            imageModal.addEventListener('click', (e) => {
+                if (e.target.id === 'image-modal') {
+                    hideImageModal();
+                }
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === "Escape" && !imageModal.classList.contains('hidden')) {
+                    hideImageModal();
+                }
+            });
+        }
     </script>
 
 </body>

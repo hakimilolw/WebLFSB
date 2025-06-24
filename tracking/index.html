@@ -137,7 +137,7 @@
                             <tr>
                                 <th>Item Name</th>
                                 <th>Item ID</th>
-                                <th>Recipient</th>
+                                <th>Client</th>
                                 <th>Progress</th>
                                 <th>ETA</th>
                                 <th>Action</th>
@@ -178,10 +178,10 @@
         <div class="modal-content">
             <span class="close">&times;</span>
             <h3>Add New Item</h3>
-            <form id="addItemForm">
-                <div class="form-group"><label for="itemName">Item Name</label><input type="text" id="itemName" required></div>
-                <div class="form-group"><label for="itemId">Item ID</label><input type="text" id="itemId" required></div>
-                <div class="form-group"><label for="receipient">Recipient</label><input type="text" id="receipient" required></div>
+            <form id="addItemForm"> 
+                <div class="form-group"><label for="itemName">Item Name</label><input type="text" id="itemName" required></div> 
+                <div class="form-group"><label for="itemId">Item ID</label><input type="text" id="itemId" required></div> 
+                <div class="form-group"><label for="client">Client</label><input type="text" id="client" required></div> 
                 <div class="form-group"><label for="eta">ETA</label><input type="text" id="eta" required></div>
                 <button type="submit" class="btn">Submit</button>
             </form>
@@ -193,9 +193,9 @@
             <h3>Edit Item</h3>
             <form id="editItemForm">
                 <input type="hidden" id="editItemRowId">
-                <div class="form-group"><label for="editItemName">Item Name</label><input type="text" id="editItemName" required></div>
-                <div class="form-group"><label for="editItemIdNo">Item ID</label><input type="text" id="editItemIdNo" required></div>
-                <div class="form-group"><label for="editReceipient">Recipient</label><input type="text" id="editReceipient" required></div>
+                <div class="form-group"><label for="editItemName">Item Name</label><input type="text" id="editItemName" required></div> 
+                <div class="form-group"><label for="editItemIdNo">Item ID</label><input type="text" id="editItemIdNo" required></div> 
+                <div class="form-group"><label for="editClient">Client</label><input type="text" id="editClient" required></div> 
                 <div class="form-group">
                     <label for="editProgress">Progress</label>
                     <select id="editProgress" required>
@@ -221,6 +221,7 @@
                 <div class="form-group"><label for="editDescription">Description</label><textarea id="editDescription" rows="3"></textarea></div>
                 <div class="form-group"><label for="editDate">Date</label><input type="date" id="editDate" required></div>
                 <div class="form-group"><label for="editTime">Time</label><input type="time" id="editTime" required></div>
+                <div class="form-group"><label for="editProgressImage">Image (Optional)</label><input type="file" id="editProgressImage" name="progressImage" accept="image/*"></div>
                 <div class="form-group"><label for="editEta">ETA</label><input type="text" id="editEta" required></div>
                 <button type="submit" class="btn">Submit</button>
             </form>
@@ -312,7 +313,7 @@
                                 row.innerHTML = `
                                     <td>${item.item_name}</td>
                                     <td>${item.item_id}</td>
-                                    <td>${item.receipient}</td>
+                                    <td>${item.client}</td>
                                     <td>${item.progress || 'N/A'}</td>
                                     <td>${item.eta}</td>
                                     <td class="actions">
@@ -347,8 +348,8 @@
                 e.preventDefault();
                 const itemData = {
                     itemName: document.getElementById('itemName').value,
-                    itemId: document.getElementById('itemId').value,
-                    receipient: document.getElementById('receipient').value,
+                    itemId: document.getElementById('itemId').value, 
+                    client: document.getElementById('client').value, 
                     eta: document.getElementById('eta').value
                 };
                 fetch('api.php?path=addItem', {
@@ -361,21 +362,32 @@
             document.getElementById('editItemForm').addEventListener('submit', function(e) {
                 e.preventDefault();
                 const id = document.getElementById('editItemRowId').value;
-                const itemData = {
-                    itemName: document.getElementById('editItemName').value,
-                    itemId: document.getElementById('editItemIdNo').value,
-                    receipient: document.getElementById('editReceipient').value,
-                    progress: document.getElementById('editProgress').value,
-                    description: document.getElementById('editDescription').value,
-                    date: document.getElementById('editDate').value,
-                    time: document.getElementById('editTime').value,
-                    eta: document.getElementById('editEta').value,
-                };
-                fetch(`api.php?path=editItem/${id}`, {
-                    method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(itemData)
+                const formData = new FormData();
+
+                formData.append('itemName', document.getElementById('editItemName').value);
+                formData.append('itemId', document.getElementById('editItemIdNo').value);
+                formData.append('client', document.getElementById('editClient').value);
+                formData.append('progress', document.getElementById('editProgress').value);
+                formData.append('description', document.getElementById('editDescription').value);
+                formData.append('date', document.getElementById('editDate').value);
+                formData.append('time', document.getElementById('editTime').value);
+                formData.append('eta', document.getElementById('editEta').value);
+
+                const imageInput = document.getElementById('editProgressImage');
+                if (imageInput.files.length > 0) {
+                    formData.append('progressImage', imageInput.files[0]);
+                }
+
+                fetch(`api.php?path=updateItem/${id}`, {
+                    method: 'POST',
+                    body: formData
                 }).then(res => res.json()).then(data => {
-                    closeAllModals(); getItems(); showNotification(data.message || 'Item updated!');
-                }).catch(err => console.error('Error:', err));
+                    if (data.error) {
+                        showNotification('Error: ' + data.error);
+                    } else {
+                        closeAllModals(); getItems(); showNotification(data.message || 'Item updated!');
+                    }
+                }).catch(err => { console.error('Error:', err); showNotification('An unexpected error occurred.'); });
             });
 
             itemTableBody.addEventListener('click', function(e) {
@@ -399,7 +411,8 @@
                                 const isDelivered = p.progress.toLowerCase() === 'delivery to client';
                                 const date = new Date(`${p.date}T${p.time}`).toLocaleDateString('en-GB');
                                 const time = new Date(`${p.date}T${p.time}`).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
-                                timeline.innerHTML += `<li class="timeline-item ${isDelivered ? 'delivered' : ''}"><div class="timeline-icon"></div><div class="timeline-body"><div class="time">${date} ${time}</div><h4>${p.progress}</h4><p>${p.description}</p></div></li>`;
+                                const imageHtml = p.image_path ? `<p><img src="${p.image_path}" alt="Progress Image" style="max-width: 100%; margin-top: 10px; border-radius: 4px;"></p>` : '';
+                                timeline.innerHTML += `<li class="timeline-item ${isDelivered ? 'delivered' : ''}"><div class="timeline-icon"></div><div class="timeline-body"><div class="time">${date} ${time}</div><h4>${p.progress}</h4><p>${p.description}</p>${imageHtml}</div></li>`;
                             });
                         } else {
                             timeline.innerHTML = '<li>No progress has been recorded for this item yet.</li>';
@@ -412,7 +425,7 @@
                     document.getElementById('editItemRowId').value = id;
                     document.getElementById('editItemName').value = row.cells[0].innerText;
                     document.getElementById('editItemIdNo').value = row.cells[1].innerText;
-                    document.getElementById('editReceipient').value = row.cells[2].innerText;
+                    document.getElementById('editClient').value = row.cells[2].innerText;
                     document.getElementById('editEta').value = row.cells[4].innerText;
                     document.getElementById('editDate').valueAsDate = new Date();
                     document.getElementById('editTime').value = new Date().toTimeString().slice(0, 5);

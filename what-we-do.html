@@ -79,18 +79,28 @@
     <div id="mobile-menu" class="hidden lg:hidden fixed inset-0 bg-gray-900/95 backdrop-blur-md z-40 pt-24">
         <nav class="flex flex-col items-center space-y-8">
             <a href="index.html" class="text-white/90 uppercase text-lg font-medium tracking-wider transition-colors duration-300 hover:text-white">Home</a>
-            <a href="who-we-are.html" class="text-white/90 uppercase text-lg font-medium tracking-wider transition-colors duration-300 hover:text-white">Who We Are</a>
-            <div class="-mt-6 flex flex-col items-center space-y-2">
-                <a href="who-we-are.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Overview</a>
-                <a href="vision-mission.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Vision & Mission</a>
-                <a href="policies.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Our Policies</a>
-                <a href="cert.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Certification</a>
-                <a href="track-record.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Track Record</a>
+            <div class="w-full text-center">
+                <button class="mobile-menu-toggle text-white/90 uppercase text-lg font-medium tracking-wider transition-colors duration-300 hover:text-white inline-flex items-center">
+                    <span>Who We Are</span>
+                    <svg class="w-5 h-5 ml-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </button>
+                <div class="mobile-submenu hidden flex flex-col items-center space-y-4 pt-4">
+                    <a href="who-we-are.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Overview</a>
+                    <a href="vision-mission.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Vision & Mission</a>
+                    <a href="policies.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Our Policies</a>
+                    <a href="cert.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Certification</a>
+                    <a href="track-record.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Track Record</a>
+                </div>
             </div>
-            <a href="what-we-do.html" class="text-white/90 uppercase text-lg font-medium tracking-wider transition-colors duration-300 hover:text-white">What We Do</a>
-            <div class="-mt-6 flex flex-col items-center space-y-2">
-                <a href="what-we-do.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Overview</a>
-                <a href="gallery.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Gallery</a>
+            <div class="w-full text-center">
+                <button class="mobile-menu-toggle text-white/90 uppercase text-lg font-medium tracking-wider transition-colors duration-300 hover:text-white inline-flex items-center">
+                    <span>What We Do</span>
+                    <svg class="w-5 h-5 ml-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </button>
+                <div class="mobile-submenu hidden flex flex-col items-center space-y-4 pt-4">
+                    <a href="what-we-do.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Overview</a>
+                    <a href="gallery.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Gallery</a>
+                </div>
             </div>
             <a href="contact-us.html" class="text-white/90 uppercase text-lg font-medium tracking-wider transition-colors duration-300 hover:text-white">Contact Us</a>
             <a href="career-internship.html" class="text-white/90 uppercase text-lg font-medium tracking-wider transition-colors duration-300 hover:text-white">Career / Internship</a>
@@ -276,37 +286,39 @@
         </div>
     </div>
 
-    <script>
-        // --- Standard Page Scripts ---
-        const burgerMenuBtn = document.getElementById('burger-menu');
-        const mobileMenu = document.getElementById('mobile-menu');
-        const mainHeader = document.getElementById('main-header');
-        const backToTopBtn = document.getElementById('back-to-top-btn');
+<script>
+    // --- Standard Page Scripts ---
+    const burgerMenuBtn = document.getElementById('burger-menu');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const mainHeader = document.getElementById('main-header');
+    const backToTopBtn = document.getElementById('back-to-top-btn');
+    const whatsappBtn = document.querySelector('.float');
 
-        burgerMenuBtn.addEventListener('click', () => {
-            mobileMenu.classList.toggle('hidden');
-        });
-        
-        let lastScrollY = window.scrollY;
-        window.addEventListener('scroll', () => {
-            const currentScrollY = window.scrollY;
-            if (currentScrollY > lastScrollY && currentScrollY > 150) {
-                mainHeader.classList.add('-translate-y-full');
+    burgerMenuBtn.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+    });
+
+    let lastScrollY = window.scrollY;
+    window.addEventListener('scroll', () => {
+        const currentScrollY = window.scrollY;
+        if (currentScrollY > lastScrollY && currentScrollY > 150) {
+            mainHeader.classList.add('-translate-y-full');
+        } else {
+            mainHeader.classList.remove('-translate-y-full');
+        }
+
+        lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY;
+
+        if (backToTopBtn) {
+            if (window.scrollY > 300) {
+                backToTopBtn.classList.remove('hidden');
             } else {
-                mainHeader.classList.remove('-translate-y-full');
+                backToTopBtn.classList.add('hidden');
             }
-            
-            lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY; 
-            
-            if (backToTopBtn) {
-                if (window.scrollY > 300) {
-                    backToTopBtn.classList.remove('hidden');
-                } else {
-                    backToTopBtn.classList.add('hidden');
-                }
-            }
-        });
+        }
+    });
 
+    if (backToTopBtn) {
         backToTopBtn.addEventListener('click', (e) => {
             e.preventDefault();
             window.scrollTo({
@@ -314,61 +326,97 @@
                 behavior: 'smooth'
             });
         });
+    }
 
-        // --- Service Tab Filtering Script ---
-        const serviceTabs = document.querySelectorAll('.service-tab');
-        const contentPanels = document.querySelectorAll('.service-panel');
+    // --- Mobile Menu Accordion ---
+    const mobileMenuToggles = document.querySelectorAll('.mobile-menu-toggle');
+    mobileMenuToggles.forEach(toggle => {
+        toggle.addEventListener('click', () => {
+            const submenu = toggle.nextElementSibling;
+            const icon = toggle.querySelector('svg');
 
-        serviceTabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                serviceTabs.forEach(item => item.classList.remove('active'));
-                tab.classList.add('active');
-                
-                const targetId = tab.dataset.target;
-                
-                contentPanels.forEach(panel => {
-                    panel.classList.add('hidden');
-                });
-                
-                document.querySelector(targetId).classList.remove('hidden');
-            });
+            submenu.classList.toggle('hidden');
+            icon.classList.toggle('rotate-180');
         });
+    });
 
-        // --- Brochure Modal Script ---
-        const brochureModal = document.getElementById('brochure-modal');
-        const closeBrochureModalBtn = document.getElementById('close-brochure-modal');
-        const modalBrochurePdf = document.getElementById('modal-brochure-pdf');
-        const openBrochureModalBtns = document.querySelectorAll('.brochure-modal-trigger');
+    // --- Service Tab Filtering Script ---
+    const serviceTabs = document.querySelectorAll('.service-tab');
+    const contentPanels = document.querySelectorAll('.service-panel');
 
-        const hideBrochureModal = () => {
-            brochureModal.classList.add('hidden');
-            modalBrochurePdf.src = ''; // Clear src to stop video/audio if any and free up resources
-        };
+    serviceTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            serviceTabs.forEach(item => item.classList.remove('active'));
+            tab.classList.add('active');
 
-        openBrochureModalBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                const pdfSrc = btn.dataset.pdfSrc;
-                if (pdfSrc) {
-                    modalBrochurePdf.src = pdfSrc;
-                    brochureModal.classList.remove('hidden');
-                }
+            const targetId = tab.dataset.target;
+
+            contentPanels.forEach(panel => {
+                panel.classList.add('hidden');
             });
-        });
 
-        closeBrochureModalBtn.addEventListener('click', hideBrochureModal);
-        
-        brochureModal.addEventListener('click', (e) => {
-            if (e.target.id === 'brochure-modal') { // Click outside the modal content
-                hideBrochureModal();
+            document.querySelector(targetId).classList.remove('hidden');
+        });
+    });
+
+    // --- Brochure Modal Script (UPDATED FOR MOBILE) ---
+    const brochureModal = document.getElementById('brochure-modal');
+    const closeBrochureModalBtn = document.getElementById('close-brochure-modal');
+    const modalBrochurePdf = document.getElementById('modal-brochure-pdf');
+    const openBrochureModalBtns = document.querySelectorAll('.brochure-modal-trigger');
+
+    // This function shows the modal (for desktop)
+    const showBrochureModal = (pdfSrc) => {
+        if (pdfSrc) {
+            modalBrochurePdf.src = pdfSrc;
+            brochureModal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            if (whatsappBtn) whatsappBtn.style.display = 'none';
+            if (backToTopBtn) backToTopBtn.style.display = 'none';
+        }
+    };
+    
+    // This function hides the modal (for desktop)
+    const hideBrochureModal = () => {
+        brochureModal.classList.add('hidden');
+        modalBrochurePdf.src = '';
+        document.body.style.overflow = 'auto';
+        if (whatsappBtn) whatsappBtn.style.display = 'block';
+        if (backToTopBtn) backToTopBtn.style.display = 'block';
+    };
+
+    // Add event listeners to all "See More" buttons
+    openBrochureModalBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault(); // Prevent default link behavior
+            const pdfSrc = btn.dataset.pdfSrc;
+
+            // Check screen width. 768px is the standard breakpoint for 'medium' devices in Tailwind CSS.
+            if (window.innerWidth < 768) {
+                // MOBILE: Open the PDF in a new tab
+                window.open(pdfSrc, '_blank');
+            } else {
+                // DESKTOP: Show the modal
+                showBrochureModal(pdfSrc);
             }
         });
+    });
 
-        document.addEventListener('keydown', (e) => {
-            if (e.key === "Escape" && !brochureModal.classList.contains('hidden')) {
-                hideBrochureModal();
-            }
-        });
-    </script>
+    
+    closeBrochureModalBtn.addEventListener('click', hideBrochureModal);
+
+    brochureModal.addEventListener('click', (e) => {
+        if (e.target.id === 'brochure-modal') {
+            hideBrochureModal();
+        }
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === "Escape" && !brochureModal.classList.contains('hidden')) {
+            hideBrochureModal();
+        }
+    });
+</script>
 
 </body>
 </html>

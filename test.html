@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuraGold AI - Live Trading Bot (5-Min)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0a0a0a;
+            color: #e2e8f0;
+        }
+        .gold-gradient-text {
+            background: linear-gradient(90deg, #d4af37, #fde047, #d4af37);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-fill-color: transparent;
+        }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+        .status-stopped { background-color: #f87171; color: white; }
+        .status-running { background-color: #22c55e; color: white; }
+        .log-area {
+            background-color: #111827;
+            border: 1px solid #374151;
+            border-radius: 8px;
+            padding: 1rem;
+            height: 250px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 0.875rem;
+        }
+        .pnl-positive { color: #4ade80; }
+        .pnl-negative { color: #f87171; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-black/50 backdrop-blur-md sticky top-0 z-40 border-b border-gray-800">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex items-center space-x-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-400"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="m12 14 4-2.5"></path><path d="m12 14-4-2.5"></path><path d="m12 14-4 2.5"></path><path d="m12 14 4 2.5"></path><path d="m12 14-4-2.5"></path></svg>
+                    <span class="text-2xl font-bold text-white">Aura<span class="gold-gradient-text">Gold</span> AI Bot</span>
+                </div>
+                <div>
+                     <span id="bot-status-badge" class="status-badge status-stopped">
+                        <i data-lucide="square" class="w-4 h-4 mr-2"></i>
+                        <span>Bot Stopped</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 sm:p-6 lg:p-8">
+        <div id="api-key-section" class="max-w-xl mx-auto text-center">
+             <div class="bg-gray-900/50 border border-gray-800 rounded-xl p-8">
+                <i data-lucide="key-round" class="w-12 h-12 mx-auto text-amber-400 mb-4"></i>
+                <h2 class="text-2xl font-bold text-white">Enter Polygon.io API Key</h2>
+                <div class="flex flex-col sm:flex-row gap-2 mt-6">
+                    <input type="text" id="api-key-input" value="bUqru4lT0lnGqPMKKrMv5fK_ivBUAaCA" class="w-full px-4 py-3 rounded-lg outline-none focus:ring-2 focus:ring-amber-400 transition bg-gray-800 border border-gray-700">
+                    <button id="init-button" class="px-6 py-3 font-semibold text-black bg-amber-400 rounded-lg hover:bg-amber-500 transition-all duration-300">Initialize Bot</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="main-content" class="hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Left Panel: Controls and Portfolio -->
+                <div class="lg:col-span-1 space-y-6">
+                    <div class="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
+                        <h2 class="text-xl font-bold mb-4 text-white">Bot Controls</h2>
+                        <div class="flex gap-4">
+                            <button id="start-bot-button" class="w-full flex items-center justify-center px-6 py-3 font-bold text-white bg-green-600 rounded-lg hover:bg-green-500 transition-all duration-300 disabled:bg-gray-500 disabled:cursor-not-allowed">
+                                <i data-lucide="play" class="w-5 h-5 mr-2"></i> Start Bot
+                            </button>
+                             <button id="stop-bot-button" class="w-full flex items-center justify-center px-6 py-3 font-bold text-white bg-red-600 rounded-lg hover:bg-red-500 transition-all duration-300 disabled:bg-gray-500 disabled:cursor-not-allowed">
+                                <i data-lucide="stop-circle" class="w-5 h-5 mr-2"></i> Stop Bot
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
+                        <h2 class="text-xl font-bold mb-4 text-white">Portfolio</h2>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-baseline">
+                                <span class="text-slate-400">Balance:</span>
+                                <span id="portfolio-balance" class="text-2xl font-bold text-white">$10,000.00</span>
+                            </div>
+                            <div class="flex justify-between items-baseline">
+                                <span class="text-slate-400">Position:</span>
+                                <span id="portfolio-position" class="text-lg font-semibold text-gray-400">FLAT</span>
+                            </div>
+                            <div class="flex justify-between items-baseline">
+                                <span class="text-slate-400">Shares:</span>
+                                <span id="portfolio-shares" class="text-lg font-semibold text-white">0</span>
+                            </div>
+                            <div class="flex justify-between items-baseline">
+                                <span class="text-slate-400">Entry Price:</span>
+                                <span id="portfolio-entry-price" class="text-lg font-semibold text-white">N/A</span>
+                            </div>
+                             <div class="flex justify-between items-baseline">
+                                <span class="text-slate-400">Market Value:</span>
+                                <span id="portfolio-market-value" class="text-lg font-semibold text-white">$0.00</span>
+                            </div>
+                            <div class="flex justify-between items-baseline border-t border-gray-700 pt-3 mt-2">
+                                <span class="text-slate-400 text-xl">P/L:</span>
+                                <span id="portfolio-pl" class="text-2xl font-bold text-gray-400">$0.00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-900/50 border border-gray-800 rounded-xl p-6 text-center">
+                        <h2 class="text-xl font-bold mb-2 text-white">Live AI Prediction</h2>
+                        <p class="text-sm text-slate-400 mb-4">Current Signal (Next 5 Min)</p>
+                        <div id="prediction-output" class="text-4xl font-black tracking-wider text-gray-500 transition-all duration-300">
+                            AWAITING SIGNAL
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Panel: Chart and Logs -->
+                <div class="lg:col-span-2 space-y-6">
+                    <div class="bg-gray-900/50 border border-gray-800 rounded-xl p-4 md:p-6 shadow-2xl shadow-black/50">
+                        <h2 class="text-2xl font-bold text-white mb-4">XAU/USD Live Chart (5-Min)</h2>
+                        <div class="h-[450px]">
+                            <canvas id="priceChart"></canvas>
+                        </div>
+                    </div>
+                     <div class="bg-gray-900/50 border border-gray-800 rounded-xl p-4 md:p-6">
+                        <h2 class="text-xl font-bold mb-4 text-white">Trade Log</h2>
+                        <div id="log-area" class="log-area"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // --- UI Element References ---
+        const ui = {
+            apiKeySection: document.getElementById('api-key-section'),
+            mainContent: document.getElementById('main-content'),
+            apiKeyInput: document.getElementById('api-key-input'),
+            initButton: document.getElementById('init-button'),
+            startBotButton: document.getElementById('start-bot-button'),
+            stopBotButton: document.getElementById('stop-bot-button'),
+            botStatusBadge: document.getElementById('bot-status-badge'),
+            predictionOutput: document.getElementById('prediction-output'),
+            logArea: document.getElementById('log-area'),
+            priceChartCanvas: document.getElementById('priceChart'),
+            portfolio: {
+                balance: document.getElementById('portfolio-balance'),
+                position: document.getElementById('portfolio-position'),
+                shares: document.getElementById('portfolio-shares'),
+                entryPrice: document.getElementById('portfolio-entry-price'),
+                marketValue: document.getElementById('portfolio-market-value'),
+                pl: document.getElementById('portfolio-pl'),
+            }
+        };
+
+        // --- Global State ---
+        let aiModel = null;
+        let priceChart = null;
+        let historicalData = [];
+        let normalizationData = {};
+        let botInterval = null;
+        let apiKey = '';
+        let lastCandleTimestamp = 0;
+
+        const SEQUENCE_LENGTH = 30; // Use last 30 5-min candles
+        const PREDICTION_HORIZON = 1; // Predict 1 5-min candle ahead
+        
+        // --- Portfolio State ---
+        let portfolio = {
+            balance: 10000,
+            position: 'FLAT', // LONG, SHORT, FLAT
+            shares: 0,
+            entryPrice: 0
+        };
+
+        // --- Logging Utility ---
+        function log(message, type = 'info') {
+            const p = document.createElement('p');
+            const timestamp = new Date().toLocaleTimeString();
+            p.innerHTML = `<span class="text-gray-500">${timestamp}:</span> ${message}`;
+            const typeClasses = {
+                success: 'text-green-400', error: 'text-red-400', warn: 'text-yellow-400',
+                buy: 'text-cyan-400', sell: 'text-fuchsia-400'
+            };
+            if (typeClasses[type]) p.classList.add(typeClasses[type]);
+            ui.logArea.appendChild(p);
+            ui.logArea.scrollTop = ui.logArea.scrollHeight;
+        }
+        
+        // --- UI State Management ---
+        function updateStatus(status, message) {
+            const isRunning = status === 'running';
+            ui.botStatusBadge.className = `status-badge ${isRunning ? 'status-running' : 'status-stopped'}`;
+            ui.botStatusBadge.innerHTML = `<i data-lucide="${isRunning ? 'play-circle' : 'square'}" class="w-4 h-4 mr-2 ${isRunning ? 'animate-pulse' : ''}"></i><span>${message}</span>`;
+            lucide.createIcons();
+            ui.startBotButton.disabled = isRunning;
+            ui.stopBotButton.disabled = !isRunning;
+        }
+
+        // --- Data & Feature Engineering ---
+        async function fetchInitialData(apiKey) {
+            log(`Fetching initial 5-minute market data...`);
+            const today = new Date();
+            const sevenDaysAgo = new Date();
+            sevenDaysAgo.setDate(today.getDate() - 7);
+            
+            const toDate = today.toISOString().split('T')[0];
+            const fromDate = sevenDaysAgo.toISOString().split('T')[0];
+
+            let allResults = [];
+            let nextUrl = `https://api.polygon.io/v2/aggs/ticker/C:XAUUSD/range/5/minute/${fromDate}/${toDate}?adjusted=true&sort=asc&limit=50000&apiKey=${apiKey}`;
+            
+            try {
+                while (nextUrl) {
+                    const response = await fetch(nextUrl);
+                    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                    const data = await response.json();
+                    if (data.results) allResults = allResults.concat(data.results);
+                    nextUrl = data.next_url ? `${data.next_url}&apiKey=${apiKey}` : null;
+                }
+                if (allResults.length === 0) throw new Error("API returned no data for the specified date range.");
+                historicalData = allResults.map(item => ({ time: item.t, price: item.c }));
+                log(`Successfully fetched ${historicalData.length} initial data points.`, 'success');
+                return true;
+            } catch (error) {
+                log(`API Error: ${error.message}`, 'error');
+                return false;
+            }
+        }
+        
+        async function fetchCurrentPrice(apiKey) {
+            const url = `https://api.polygon.io/v1/last_quote/currencies/XAU/USD?apiKey=${apiKey}`;
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                const data = await response.json();
+                if (!data.last || !data.last.ask) {
+                    log('Invalid price data received.', 'warn');
+                    return null;
+                }
+                return { price: data.last.ask, time: data.last.timestamp };
+            } catch(error) {
+                log(`Error fetching current price: ${error.message}`, 'error');
+                return null;
+            }
+        }
+
+
+        function calculateFeatures(data) {
+            const prices = data.map(d => d.price);
+            const sma20 = calculateSMA(prices, 20);
+            const rsi14 = calculateRSI(prices, 14);
+            return data.map((d, i) => ({ ...d, sma20: sma20[i], rsi14: rsi14[i] })).slice(20);
+        }
+
+        function calculateSMA(data, windowSize) {
+            const sma = Array(windowSize - 1).fill(null);
+            for (let i = 0; i <= data.length - windowSize; i++) {
+                sma.push(data.slice(i, i + windowSize).reduce((a, b) => a + b, 0) / windowSize);
+            }
+            return sma;
+        }
+
+        function calculateRSI(data, period) {
+            const rsi = Array(data.length).fill(null);
+            if (data.length < period) return rsi;
+            let gains = 0, losses = 0;
+            for (let i = 1; i <= period; i++) {
+                const diff = data[i] - data[i - 1];
+                if (diff >= 0) { gains += diff; } else { losses -= diff; }
+            }
+            let avgGain = gains / period, avgLoss = losses / period;
+            rsi[period] = 100 - (100 / (1 + (avgGain / avgLoss)));
+            for (let i = period + 1; i < data.length; i++) {
+                const diff = data[i] - data[i - 1];
+                avgGain = (avgGain * (period - 1) + (diff > 0 ? diff : 0)) / period;
+                avgLoss = (avgLoss * (period - 1) + (diff < 0 ? -diff : 0)) / period;
+                rsi[i] = avgLoss === 0 ? 100 : 100 - (100 / (1 + (avgGain / avgLoss)));
+            }
+            return rsi;
+        }
+
+        // --- AI Model ---
+        function createModel() {
+            log('Creating Neural Network model...');
+            const model = tf.sequential();
+            // Specify kernelInitializer to avoid performance warnings on large layers
+            model.add(tf.layers.lstm({ units: 50, returnSequences: true, inputShape: [SEQUENCE_LENGTH, 2], kernelInitializer: 'glorotUniform' }));
+            model.add(tf.layers.dropout(0.2));
+            model.add(tf.layers.lstm({ units: 50, returnSequences: false, kernelInitializer: 'glorotUniform' }));
+            model.add(tf.layers.dropout(0.2));
+            model.add(tf.layers.dense({ units: 1, activation: 'sigmoid' }));
+            model.compile({ optimizer: 'adam', loss: 'binaryCrossentropy', metrics: ['accuracy'] });
+            log('Model created successfully.', 'success');
+            return model;
+        }
+
+        async function trainModel(featureData) {
+            log('Training AI model...');
+            const features = featureData.map(d => [d.sma20, d.rsi14]);
+            const targets = featureData.map((d, i) => (i > 0 && d.price > featureData[i-1].price ? 1 : 0));
+            
+            const featureTensor = tf.tensor2d(features);
+            normalizationData.featureMin = featureTensor.min(0);
+            normalizationData.featureMax = featureTensor.max(0);
+            const normalizedFeatures = featureTensor.sub(normalizationData.featureMin).div(normalizationData.featureMax.sub(normalizationData.featureMin));
+
+            const sequences = [], labels = [];
+            for (let i = 0; i <= normalizedFeatures.shape[0] - SEQUENCE_LENGTH - PREDICTION_HORIZON; i++) {
+                sequences.push(normalizedFeatures.slice([i, 0], [SEQUENCE_LENGTH, 2]));
+                labels.push(targets[i + SEQUENCE_LENGTH - 1 + PREDICTION_HORIZON]);
+            }
+            const xs = tf.stack(sequences), ys = tf.tensor2d(labels, [labels.length, 1]);
+
+            await aiModel.fit(xs, ys, { epochs: 10, batchSize: 32, callbacks: {
+                onEpochEnd: (epoch, logs) => log(`Epoch ${epoch+1}: Loss=${logs.loss.toFixed(4)}, Acc=${logs.acc.toFixed(4)}`)
+            }});
+            log('Model training complete!', 'success');
+        }
+
+        async function makePrediction(featureData) {
+            if (!aiModel || featureData.length < SEQUENCE_LENGTH) return 'NEUTRAL';
+            const lastSequence = featureData.slice(-SEQUENCE_LENGTH);
+            const featuresToNormalize = lastSequence.map(d => [d.sma20, d.rsi14]);
+            const featureTensor = tf.tensor2d(featuresToNormalize);
+            const normalizedFeatures = featureTensor.sub(normalizationData.featureMin).div(normalizationData.featureMax.sub(normalizationData.featureMin));
+            const inputTensor = normalizedFeatures.expandDims(0);
+            const prediction = aiModel.predict(inputTensor);
+            const confidence = (await prediction.data())[0];
+            
+            let signal = 'NEUTRAL';
+            if (confidence > 0.55) signal = 'UP';
+            else if (confidence < 0.45) signal = 'DOWN';
+            
+            ui.predictionOutput.textContent = signal;
+            const colorClass = {'UP': 'text-green-400', 'DOWN': 'text-red-400', 'NEUTRAL': 'text-gray-500'}[signal];
+            ui.predictionOutput.className = `text-4xl font-black tracking-wider ${colorClass}`;
+            return signal;
+        }
+
+        // --- Trading Logic ---
+        function executeTrade(signal, price) {
+            const positionSize = 1;
+
+            if (signal === 'UP' && portfolio.position === 'SHORT') closePosition(price);
+            if (signal === 'DOWN' && portfolio.position === 'LONG') closePosition(price);
+            if (signal === 'NEUTRAL' && portfolio.position !== 'FLAT') closePosition(price);
+
+            if (signal === 'UP' && portfolio.position === 'FLAT') {
+                portfolio.position = 'LONG';
+                portfolio.shares = positionSize;
+                portfolio.entryPrice = price;
+                portfolio.balance -= positionSize * price;
+                log(`EXECUTE BUY @ ${price.toFixed(2)}`, 'buy');
+                addTradeAnnotation('BUY', price);
+            } else if (signal === 'DOWN' && portfolio.position === 'FLAT') {
+                portfolio.position = 'SHORT';
+                portfolio.shares = positionSize;
+                portfolio.entryPrice = price;
+                portfolio.balance += positionSize * price;
+                log(`EXECUTE SELL @ ${price.toFixed(2)}`, 'sell');
+                addTradeAnnotation('SELL', price);
+            }
+            updatePortfolioUI(price);
+        }
+
+        function closePosition(price) {
+            let profit = 0;
+            if (portfolio.position === 'LONG') {
+                profit = (price - portfolio.entryPrice) * portfolio.shares;
+                portfolio.balance += portfolio.shares * price;
+                log(`CLOSE LONG for P/L: $${profit.toFixed(2)}`, 'sell');
+            } else if (portfolio.position === 'SHORT') {
+                profit = (portfolio.entryPrice - price) * portfolio.shares;
+                portfolio.balance -= portfolio.shares * price;
+                log(`CLOSE SHORT for P/L: $${profit.toFixed(2)}`, 'buy');
+            }
+            portfolio.position = 'FLAT';
+            portfolio.shares = 0;
+            portfolio.entryPrice = 0;
+        }
+
+        // --- UI and Charting ---
+        function updatePortfolioUI(currentPrice) {
+            ui.portfolio.balance.textContent = `$${portfolio.balance.toFixed(2)}`;
+            ui.portfolio.position.textContent = portfolio.position;
+            ui.portfolio.shares.textContent = portfolio.shares;
+            ui.portfolio.entryPrice.textContent = portfolio.entryPrice > 0 ? `$${portfolio.entryPrice.toFixed(2)}` : 'N/A';
+            
+            let marketValue = 0, pl = 0;
+            if (portfolio.position === 'LONG') {
+                marketValue = portfolio.shares * currentPrice;
+                pl = (currentPrice - portfolio.entryPrice) * portfolio.shares;
+            } else if (portfolio.position === 'SHORT') {
+                marketValue = portfolio.shares * portfolio.entryPrice - (portfolio.shares * (currentPrice - portfolio.entryPrice));
+                pl = (portfolio.entryPrice - currentPrice) * portfolio.shares;
+            }
+            
+            ui.portfolio.marketValue.textContent = `$${marketValue.toFixed(2)}`;
+            ui.portfolio.pl.textContent = `$${pl.toFixed(2)}`;
+            ui.portfolio.pl.className = `text-2xl font-bold ${pl >= 0 ? 'pnl-positive' : 'pnl-negative'}`;
+        }
+
+        function renderChart(featureData) {
+            const labels = featureData.map(d => d.time);
+            if (priceChart) {
+                priceChart.data.labels = labels;
+                priceChart.data.datasets[0].data = featureData.map(d => d.price);
+                priceChart.update('none'); 
+            } else {
+                priceChart = new Chart(ui.priceChartCanvas, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'XAU/USD Price',
+                            data: featureData.map(d => d.price),
+                            borderColor: '#d4af37',
+                            tension: 0.1, pointRadius: 0, borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        scales: { 
+                            x: { type: 'time', time: { unit: 'hour', displayFormats: { hour: 'HH:mm' } }, ticks: { color: '#9ca3af' } }, 
+                            y: { ticks: { color: '#9ca3af' } } 
+                        },
+                        plugins: { legend: { labels: { color: '#e2e8f0' } }, annotation: { annotations: {} } }
+                    }
+                });
+            }
+        }
+        
+        function addTradeAnnotation(type, price) {
+            const annotation = {
+                type: 'point',
+                xValue: historicalData[historicalData.length - 1].time,
+                yValue: price,
+                backgroundColor: type === 'BUY' ? 'rgba(0, 255, 255, 0.7)' : 'rgba(255, 0, 255, 0.7)',
+                radius: 5,
+                borderColor: 'white',
+                borderWidth: 1
+            };
+            const annotationId = `trade_${Date.now()}`;
+            priceChart.options.plugins.annotation.annotations[annotationId] = annotation;
+            priceChart.update();
+        }
+
+        // --- Main Bot Loop ---
+        async function runBotCycle() {
+            const currentPriceData = await fetchCurrentPrice(apiKey);
+            if (!currentPriceData) return;
+
+            const { price, time } = currentPriceData;
+            updatePortfolioUI(price);
+            
+            // Update the last point on the chart for a "live" feel
+            if (priceChart && priceChart.data.datasets[0].data.length > 0) {
+                const chartData = priceChart.data.datasets[0].data;
+                chartData[chartData.length - 1] = price;
+                priceChart.update('none');
+            }
+
+            const now = new Date(time);
+            const currentCandleTimestamp = new Date(now).setMinutes(now.getMinutes() - (now.getMinutes() % 5), 0, 0);
+
+            if (currentCandleTimestamp > lastCandleTimestamp) {
+                log(`New 5-min candle closed at ${new Date(lastCandleTimestamp).toLocaleTimeString()}`);
+                lastCandleTimestamp = currentCandleTimestamp;
+
+                // Finalize the last candle and add a new one
+                historicalData[historicalData.length - 1].price = price;
+                historicalData[historicalData.length - 1].time = currentCandleTimestamp;
+                
+                const featureData = calculateFeatures(historicalData);
+                renderChart(featureData);
+                
+                const signal = await makePrediction(featureData);
+                log(`AI Signal for next 5 mins: ${signal}`);
+                executeTrade(signal, price);
+            }
+        }
+
+        // --- Initialization and Controls ---
+        async function initialize() {
+            apiKey = ui.apiKeyInput.value;
+            if (!apiKey) {
+                log('API Key cannot be empty.', 'error');
+                return;
+            }
+            ui.initButton.disabled = true;
+            ui.initButton.innerHTML = `<i data-lucide="loader" class="w-5 h-5 mr-2 animate-spin"></i> Initializing...`;
+            lucide.createIcons();
+
+            if (await fetchInitialData(apiKey)) {
+                ui.apiKeySection.classList.add('hidden');
+                ui.mainContent.classList.remove('hidden');
+                const featureData = calculateFeatures(historicalData);
+                
+                renderChart(featureData);
+                aiModel = createModel();
+                await trainModel(featureData);
+                
+                const lastDataPointTime = new Date(historicalData[historicalData.length - 1].time);
+                lastCandleTimestamp = new Date(lastDataPointTime).setMinutes(lastDataPointTime.getMinutes() - (lastDataPointTime.getMinutes() % 5), 0, 0);
+
+                updatePortfolioUI(historicalData[historicalData.length - 1].price);
+                updateStatus('stopped', 'Bot Ready');
+            } else {
+                 ui.initButton.disabled = false;
+                 ui.initButton.textContent = 'Initialize Bot';
+            }
+        }
+
+        function startBot() {
+            if (botInterval) clearInterval(botInterval);
+            log('Starting bot...', 'success');
+            updateStatus('running', 'Bot Running');
+            // Check for new data every 15 seconds
+            botInterval = setInterval(runBotCycle, 15000); 
+        }
+
+        function stopBot() {
+            if (botInterval) clearInterval(botInterval);
+            botInterval = null;
+            log('Bot stopped.', 'warn');
+            updateStatus('stopped', 'Bot Stopped');
+        }
+
+        ui.initButton.addEventListener('click', initialize);
+        ui.startBotButton.addEventListener('click', startBot);
+        ui.stopBotButton.addEventListener('click', stopBot);
+        
+        window.onload = () => {
+            lucide.createIcons();
+            updateStatus('stopped', 'Bot Stopped');
+            ui.startBotButton.disabled = true;
+            ui.stopBotButton.disabled = true;
+        };
+
+    </script>
+</body>
+</html>

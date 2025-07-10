@@ -33,7 +33,7 @@ if (!empty($shareable_id)) {
 
         // Get the latest progress status if history exists
         if (!empty($progress_history)) {
-            $latest_progress = $progress_history[0]['progress'];
+            $latest_progress = htmlspecialchars($progress_history[0]['progress']);
         }
     }
     $stmt->close();
@@ -50,7 +50,7 @@ $conn->close();
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <style>
+        <style>
         body {
             font-family: 'Inter', sans-serif;
         }
@@ -67,18 +67,31 @@ $conn->close();
         
         .timeline { position: relative; list-style: none; padding: 0; margin-top: 30px; }
         
-        .timeline:before { 
-            content: ''; 
-            position: absolute; 
-            top: 40px; 
-            bottom: 0; 
-            width: 2px; 
-            background: #ddd; 
-            left: 20px; /* Aligns with center of the 40px icon */
-        }
-
         .timeline-item { position: relative; margin-bottom: 30px; padding-left: 70px; }
         .timeline-item:last-child { margin-bottom: 0; }
+
+        /* This rule now draws a line that extends into the margin below the item to connect with the next one */
+        .timeline-item::before {
+            content: '';
+            background-color: #ddd;
+            position: absolute;
+            width: 2px;
+            top: 0;
+            left: 19px; /* Aligned to center of the icon */
+            height: calc(100% + 30px); /* Full height of item + bottom margin */
+            z-index: 1;
+        }
+
+        /* For the FIRST item, the line starts at the icon's center */
+        .timeline-item:first-child::before {
+            top: 20px;
+            height: calc(100% + 10px); /* Adjust height to account for new top position */
+        }
+
+        /* For the LAST item, the line stops at the icon's center */
+        .timeline-item:last-child::before {
+            height: 20px;
+        }
         
         .timeline-icon { 
             position: absolute; 
@@ -89,8 +102,7 @@ $conn->close();
             border-radius: 50%; 
             background: #fff; 
             border: 3px solid #f2a202; 
-            z-index: 10;
-            /* The 'position: relative' that caused the error has been REMOVED */
+            z-index: 10; /* Ensures icon is on top of the line */
         }
 
         /* Upward pointing arrow on the icon */
@@ -99,15 +111,13 @@ $conn->close();
             position: absolute;
             width: 0;
             height: 0;
-            /* Position arrow on top of the icon */
             bottom: 100%;
             left: 50%;
             transform: translateX(-50%);
-            margin-bottom: 4px; /* Space between arrow and circle */
-            /* Create triangle shape */
+            margin-bottom: 4px; 
             border-left: 8px solid transparent;
             border-right: 8px solid transparent;
-            border-bottom: 8px solid #f2a202; /* Arrow color */
+            border-bottom: 8px solid #f2a202;
         }
         
         .timeline-item.delivered .timeline-icon { 
@@ -121,7 +131,6 @@ $conn->close();
         }
         .timeline-item.delivered .timeline-icon:before { content: '✔'; }
 
-        /* Hide the arrow on the delivered icon */
         .timeline-item.delivered .timeline-icon::after {
             display: none;
         }
@@ -226,7 +235,7 @@ $conn->close();
                             </li>
                         <?php else: ?>
                             <?php foreach ($progress_history as $index => $progress): ?>
-                                <li class="timeline-item <?php echo (strtolower($progress['progress']) == 'delivery to client') ? 'delivered' : ''; ?>">
+                                <li class="timeline-item <?php echo (strtolower($progress['progress']) == 'delivered') ? 'delivered' : ''; ?>">
                                     <div class="timeline-icon"></div>
                                     <div class="timeline-body">
                                         <div class="time">
@@ -259,11 +268,11 @@ $conn->close();
                         <p class="text-sm text-gray-400">Jalan Saberkas Utama, Jalan Pujut-Lutong,</p>
                         <p class="text-sm text-gray-400">98000 Miri, Sarawak, Malaysia.</p>
                         <div class="flex space-x-4 mt-4 justify-center md:justify-start">
-                            <a href="https://www.linkedin.com/company/legasifutura/" class="text-gray-400 hover:text-white transition-colors duration-300">
+                            <a href="https://www.linkedin.com/company/legasifutura/" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-white transition-colors duration-300">
                                 <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" clip-rule="evenodd"/></svg>
                             </a>
-                            <a href="https://www.facebook.com/p/Legasi-Futura-100094370892508/" class="text-gray-400 hover:text-white transition-colors duration-300">
-                               <svg class="w-6 h-6" fill="currentColor" viewBox="0 24" d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"/></svg>
+                            <a href="https://www.facebook.com/p/Legasi-Futura-100094370892508/" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-white transition-colors duration-300">
+                               <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"/></svg>
                             </a>
                         </div>
                     </div>
@@ -275,7 +284,6 @@ $conn->close();
         </div>
     </div>
 
-    <!-- Image Modal -->
     <div id="image-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-[100] p-4">
         <div class="bg-white p-2 rounded-lg shadow-xl max-w-4xl max-h-[90vh] relative">
             <button id="close-image-modal" class="absolute -top-3 -right-3 bg-gray-700 text-white rounded-full p-2 z-10 hover:bg-black transition-colors duration-200">
@@ -286,7 +294,7 @@ $conn->close();
     </div>
 
 
-    <a href="https://wa.me/60138626042" class="float" target="_blank">
+    <a href="https://wa.me/60138626042" class="float" target="_blank" rel="noopener noreferrer">
         <i class="fa fa-whatsapp my-float"></i>
     </a>
     <a id="back-to-top-btn" href="#" class="hidden fixed bottom-28 right-10 bg-blue-900 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition-all duration-300 z-50">

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Item Tracking Dashboard - Legasi Futura</title>
+    <title>Item Tracking Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
@@ -11,14 +11,17 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
+            background-color: #f4f7f6; /* A slightly off-white background for a cleaner look */
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
-        #main-header {
-            position: fixed !important;
+        #main-container {
+            flex-grow: 1;
         }
         /* --- Styles for Item Tracking Dashboard --- */
-        .dashboard-container { max-width: 1100px; margin: 20px auto; }
-        .dashboard { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        .dashboard h2, .dashboard h3 { text-align: center; color: #333; }
+        .dashboard-container { max-width: 1100px; margin: 40px auto; } /* Added more top margin */
+        .dashboard { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
         .dashboard table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         .dashboard th, .dashboard td { padding: 12px; border: 1px solid #ddd; text-align: left; }
         .dashboard th { background-color: #f2f2f2; }
@@ -33,10 +36,40 @@
         .form-group input, .form-group select, .form-group textarea { width: 95%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
         
         .timeline { position: relative; list-style: none; padding: 0; margin-top: 20px; }
-        .timeline:before { content: ''; position: absolute; top: 0; bottom: 0; width: 2px; background: #ddd; left: 20px; }
         .timeline-item { position: relative; margin-bottom: 20px; padding-left: 60px; }
         .timeline-item:last-child { margin-bottom: 0; }
-        .timeline-icon { position: absolute; left: 0px; top: 0; width: 40px; height: 40px; border-radius: 50%; background: #fff; border: 3px solid #f2a202; }
+
+        .timeline-item::before {
+            content: '';
+            background-color: #ddd;
+            position: absolute;
+            width: 2px;
+            top: 0;
+            left: 19px;
+            height: calc(100% + 20px);
+            z-index: 1;
+        }
+
+        .timeline-item:first-child::before {
+            top: 20px;
+            height: 100%;
+        }
+
+        .timeline-item:last-child::before {
+            height: 20px;
+        }
+        
+        .timeline-icon { 
+            position: absolute; 
+            left: 0px; 
+            top: 0; 
+            width: 40px; 
+            height: 40px; 
+            border-radius: 50%; 
+            background: #fff; 
+            border: 3px solid #f2a202; 
+            z-index: 10;
+        }
         .timeline-item.delivered .timeline-icon { background: #28a745; border-color: #28a745; color: white; display: flex; align-items: center; justify-content: center; font-size: 1.5em; }
         .timeline-item.delivered .timeline-icon:before { content: '✔'; }
         .timeline-body { position: relative; top: -5px; }
@@ -46,7 +79,7 @@
 
         #notification {
             position: fixed;
-            top: 80px; /* Adjusted for fixed header */
+            top: 20px; /* Adjusted for no header */
             right: 20px;
             background-color: #4CAF50;
             color: white;
@@ -62,76 +95,63 @@
             visibility: visible;
             transition: opacity 0.5s linear;
         }
+
+        /* --- Responsive Styles for Mobile --- */
+        @media screen and (max-width: 768px) {
+            .dashboard-container {
+                margin: 10px auto;
+            }
+            .dashboard table thead {
+                display: none;
+            }
+            .dashboard table, .dashboard table tbody, .dashboard table tr, .dashboard table td {
+                display: block;
+                width: 100%;
+            }
+            .dashboard table tr {
+                margin-bottom: 15px;
+                border: 1px solid #ddd;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            }
+            .dashboard table td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 12px 15px;
+                border: none;
+                border-bottom: 1px solid #eee;
+                text-align: right;
+            }
+            .dashboard table tr td:last-child {
+                border-bottom: none;
+            }
+            .dashboard table td::before {
+                content: attr(data-label);
+                font-weight: bold;
+                padding-right: 1em;
+                text-align: left;
+            }
+            .dashboard td.actions {
+                justify-content: center;
+            }
+            .dashboard td.actions::before {
+                display: none;
+            }
+        }
     </style>
 </head>
-<body class="bg-white text-gray-800">
-
-    <header id="main-header" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-black">
-        <div class="container mx-auto px-6 py-4">
-            <div class="flex items-center justify-between">
-                <a href="index.html" class="flex items-center space-x-2">
-                    <img src="img/logo.png" alt="Legasi Futura Logo" class="h-10">
-                </a>
-                <nav class="hidden lg:flex items-center space-x-6">
-                    <a href="index.html" class="text-white/90 uppercase text-sm font-medium tracking-wider transition-colors duration-300 hover:text-white">Home</a>
-                    <div class="relative group">
-                        <button class="flex items-center space-x-1 text-white/90 uppercase text-sm font-medium tracking-wider transition-colors duration-300 hover:text-white">
-                            <span>Who We Are</span>
-                            <svg class="w-4 h-4 transition-transform duration-300 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                        </button>
-                        <div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-gray-800 rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 invisible group-hover:visible pt-2 pb-2">
-                            <a href="who-we-are.html" class="block w-full text-left px-4 py-2 text-sm text-white/90 hover:bg-gray-700 hover:text-white">Overview</a>
-                            <a href="vision-mission.html" class="block w-full text-left px-4 py-2 text-sm text-white/90 hover:bg-gray-700 hover:text-white">Vision & Mission</a>
-                            <a href="policies.html" class="block w-full text-left px-4 py-2 text-sm text-white/90 hover:bg-gray-700 hover:text-white">Our Policies</a>
-                            <a href="cert.html" class="block w-full text-left px-4 py-2 text-sm text-white/90 hover:bg-gray-700 hover:text-white">Certification</a>
-                            <a href="track-record.html" class="block w-full text-left px-4 py-2 text-sm text-white/90 hover:bg-gray-700 hover:text-white">Track Record</a>
-                        </div>
-                    </div>
-                    <a href="what-we-do.html" class="text-white/90 uppercase text-sm font-medium tracking-wider transition-colors duration-300 hover:text-white">What We Do</a>
-                    <a href="contact-us.html" class="text-white/90 uppercase text-sm font-medium tracking-wider transition-colors duration-300 hover:text-white">Contact Us</a>
-                    <a href="career-internship.html" class="text-white/90 uppercase text-sm font-medium tracking-wider transition-colors duration-300 hover:text-white">Career / Internship</a>
-                    <button class="text-white/90 hover:text-white transition-colors duration-300">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                    </button>
-                </nav>
-                <div class="lg:hidden flex items-center space-x-4">
-                     <button class="text-white/90 hover:text-white transition-colors duration-300">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                    </button>
-                    <button id="burger-menu" class="text-white focus:outline-none">
-                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <div id="mobile-menu" class="hidden lg:hidden fixed inset-0 bg-gray-900/95 backdrop-blur-md z-40 pt-24">
-        <nav class="flex flex-col items-center space-y-8">
-            <a href="index.html" class="text-white/90 uppercase text-lg font-medium tracking-wider transition-colors duration-300 hover:text-white">Home</a>
-            <a href="who-we-are.html" class="text-white/90 uppercase text-lg font-medium tracking-wider transition-colors duration-300 hover:text-white">Who We Are</a>
-            <div class="-mt-6 pl-4">
-                <a href="who-we-are.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Overview</a><br>
-                <a href="vision-mission.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Vision & Mission</a><br>
-                <a href="policies.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Our Policies</a><br>
-                <a href="cert.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Certification</a><br>
-                <a href="track-record.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Track Record</a>
-            </div>
-            <a href="what-we-do.html" class="text-white/90 uppercase text-lg font-medium tracking-wider transition-colors duration-300 hover:text-white">What We Do</a>
-            <a href="contact-us.html" class="text-white/90 uppercase text-lg font-medium tracking-wider transition-colors duration-300 hover:text-white">Contact Us</a>
-            <a href="career-internship.html" class="text-white/90 uppercase text-lg font-medium tracking-wider transition-colors duration-300 hover:text-white">Career / Internship</a>
-        </nav>
-    </div>
+<body class="bg-gray-100 text-gray-800">
 
     <div id="main-container">
-        <main class="pt-32 pb-20">
+        <main class="py-10">
             <div id="notification"></div>
             <div class="dashboard-container">
                 <div class="dashboard">
-                    <h2>Staff View - Item Dashboard</h2>
-                    <button class="btn" id="addNewItemBtn">Add new item</button>
+                    <h2 class="text-4xl font-bold text-center text-gray-800 mb-8">Item Tracking Dashboard</h2>
+                    <div class="flex justify-end mb-4">
+                        <button class="btn" id="addNewItemBtn">Add new item</button>
+                    </div>
                     <table id="itemTable">
                         <thead>
                             <tr>
@@ -147,33 +167,15 @@
                     </table>
                 </div>
             </div>
-            </main>
-
-        <footer class="bg-gray-800 text-white py-12">
-            <div class="container mx-auto px-6">
-                <div class="text-center md:text-left">
-                    <div class="mb-6 md:mb-0">
-                        <img src="img/logo.png" alt="Legasi Futura Logo" class="h-10 mx-auto md:mx-0">
-                        <p class="text-sm text-gray-400 mt-4">1st Floor, Lot 2161 Block 5,</p>
-                        <p class="text-sm text-gray-400">Jalan Saberkas Utama, Jalan Pujut-Lutong,</p>
-                        <p class="text-sm text-gray-400">98000 Miri, Sarawak, Malaysia.</p>
-                        <div class="flex space-x-4 mt-4 justify-center md:justify-start">
-                            <a href="https://www.linkedin.com/company/legasifutura/" class="text-gray-400 hover:text-white transition-colors duration-300">
-                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" clip-rule="evenodd"/></svg>
-                            </a>
-                            <a href="https://www.facebook.com/p/Legasi-Futura-100094370892508/" class="text-gray-400 hover:text-white transition-colors duration-300">
-                               <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"/></svg>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </footer>
-        <div class="text-center text-white text-sm py-6 bg-black">
-            &copy; 2025 Legasi Futura Sdn. Bhd. All rights reserved.
-        </div>
+        </main>
     </div>
     
+    <!-- Simplified Footer -->
+    <footer class="text-center text-white text-sm py-6 bg-black">
+        &copy; 2025 Legasi Futura Sdn. Bhd. All rights reserved.
+    </footer>
+
+    <!-- Modals -->
     <div id="addItemModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
@@ -202,20 +204,18 @@
                         <option value="PO Received">PO Received</option>
                         <option value="Submission GA Drawing to client">Submission GA Drawing to client</option>
                         <option value="Kick off meeting">Kick off meeting</option>
-                        <option value="Purchasing of Materials">Purchasing of Materials</option>
-                        <option value="Procurement of Material">Procurement of Material</option>
-                        <option value="Drawing approve by client">Drawing approve by client</option>
-                        <option value="Manufacturing start">Manufacturing start</option>
+                        <option value="Procurement and purchasing of materials">Procurement and purchasing of materials</option>
+                        <option value="Drawing approve by client">Drawing approval by client</option>
+                        <option value="Fabrication start">Fabrication in progress</option>
                         <option value="Valve assembly, pre testing">Valve assembly, pre testing</option>
-                        <option value="FAT procedure sent to client (10 days before FAT)">FAT procedure sent to client (10 days before FAT)</option>
+                        <option value="FAT in Progress">FAT in Progress</option>
                         <option value="FAT with TPI">FAT with TPI</option>
-                        <option value="Painting and Coating">Painting and Coating</option>
-                        <option value="Packing">Packing</option>
-                        <option value="Delivery / custom clearance">Delivery / custom clearance</option>
-                        <option value="Delivery to site for SAT Test (witness by both client)">Delivery to site for SAT Test (witness by both client)</option>
-                        <option value="Touch-up painting then packing">Touch-up painting then packing</option>
-                        <option value="Delivery to client">Delivery to client</option>
-                        <option value="Final docs submit to client">Final docs submit to client</option>
+                        <option value="Painting and coating in progress">Painting and coating in progress</option>
+                        <option value="Packing and delivery arrangement">Packing and delivery arrangement</option>
+                        <option value="Arrival at location with customs clearance">Arrival at location with customs clearance</option>
+                        <option value="SAT in progress">SAT in progress</option>
+                        <option value="Delivery to client's yard">Delivery to client's yard</option>
+                        <option value="Delivered">Delivered</option>
                     </select>
                 </div>
                 <div class="form-group"><label for="editDescription">Description</label><textarea id="editDescription" rows="3"></textarea></div>
@@ -235,53 +235,9 @@
         </div>
     </div>
 
-    <a href="https://wa.me/60138626042" class="float" target="_blank">
-        <i class="fa fa-whatsapp my-float"></i>
-    </a>
-    <a id="back-to-top-btn" href="#" class="hidden fixed bottom-28 right-10 bg-blue-900 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition-all duration-300 z-50">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
-    </a>
-
     <script>
-        // --- Legasi Futura Template JS ---
-        const burgerMenuBtn = document.getElementById('burger-menu');
-        const mobileMenu = document.getElementById('mobile-menu');
-        const mainHeader = document.getElementById('main-header');
-        const backToTopBtn = document.getElementById('back-to-top-btn');
-
-        if (burgerMenuBtn) {
-            burgerMenuBtn.addEventListener('click', () => {
-                mobileMenu.classList.toggle('hidden');
-            });
-        }
+        // Floating buttons and their JS have been removed.
         
-        let lastScrollY = window.scrollY;
-        window.addEventListener('scroll', () => {
-            const currentScrollY = window.scrollY;
-            if (currentScrollY > lastScrollY && currentScrollY > 150) {
-                mainHeader.classList.add('-translate-y-full');
-            } else {
-                mainHeader.classList.remove('-translate-y-full');
-            }
-            
-            lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY; 
-            
-            if (backToTopBtn) {
-                if (window.scrollY > 300) {
-                    backToTopBtn.classList.remove('hidden');
-                } else {
-                    backToTopBtn.classList.add('hidden');
-                }
-            }
-        });
-
-        if (backToTopBtn) {
-            backToTopBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            });
-        }
-
         // --- Item Tracker JS ---
         document.addEventListener('DOMContentLoaded', function() {
             const itemTableBody = document.getElementById('itemTable').getElementsByTagName('tbody')[0];
@@ -311,12 +267,12 @@
                                 row.setAttribute('data-id', item.id);
                                 row.setAttribute('data-share-id', item.shareable_id);
                                 row.innerHTML = `
-                                    <td>${item.item_name}</td>
-                                    <td>${item.item_id}</td>
-                                    <td>${item.client}</td>
-                                    <td>${item.progress || 'N/A'}</td>
-                                    <td>${item.eta}</td>
-                                    <td class="actions">
+                                    <td data-label="Item Name">${item.item_name}</td>
+                                    <td data-label="Item ID">${item.item_id}</td>
+                                    <td data-label="Client">${item.client}</td>
+                                    <td data-label="Progress">${item.progress || 'N/A'}</td>
+                                    <td data-label="ETA">${item.eta}</td>
+                                    <td data-label="Action" class="actions">
                                         <a href="#" class="view-progress" title="View Progress">&#128065;</a>
                                         <a href="#" class="edit" title="Edit">&#9998;</a>
                                         <a href="#" class="share" title="Copy Client URL">&#128279;</a>
@@ -408,7 +364,7 @@
                         timeline.innerHTML = '';
                         if (progressData && progressData.length > 0) {
                             progressData.forEach(p => {
-                                const isDelivered = p.progress.toLowerCase() === 'delivery to client';
+                                const isDelivered = p.progress.toLowerCase() === 'delivered';
                                 const date = new Date(`${p.date}T${p.time}`).toLocaleDateString('en-GB');
                                 const time = new Date(`${p.date}T${p.time}`).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
                                 const imageHtml = p.image_path ? `<p><img src="${p.image_path}" alt="Progress Image" style="max-width: 100%; margin-top: 10px; border-radius: 4px;"></p>` : '';

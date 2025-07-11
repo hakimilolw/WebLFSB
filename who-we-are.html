@@ -108,73 +108,10 @@
                     <img src="img/AI/office_meeting.png" alt="Office meeting at Legasi Futura" class="rounded-lg shadow-lg max-w-5xl w-full h-auto">
                 </div>
                         
-                <p class="max-w-5xl mx-auto mb-8 text-justify">
-                    Legasi Futura Sdn. Bhd. is a 100% Sarawakian Bumiputera owned company based in Miri, Sarawak. We are registered with both Petronas and Petros and actively serve the oil and gas, telecommunication and energy industries with a comprehensive suite of services.
-                </p>
-                <p class="max-w-5xl mx-auto mb-8 text-justify">
-                    At Legasi Futura, we are a trusted partner, working closely with our clients to understand their unique requirements and deliver tailored solutions that exceed expectations. Our commitment to building long-term relationships and delivering exceptional results has earned us a solid reputation in the industry.
-                </p>                    
-                <!-- Company Profile Button -->
-                <div class="max-w-5xl mx-auto mt-16 text-center">
-                    <button id="open-profile-modal" class="bg-blue-900 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:bg-blue-700 transition-all duration-300">
-                        See Company Profile
-                    </button>
-                </div>
+                
 
             </div>
         </main>
-
-        <!-- Company Profile Modal -->
-        <div id="profile-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 z-[100] flex items-center justify-center p-4 transition-opacity duration-300">
-            <div class="bg-white rounded-lg shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
-                <!-- Modal Header -->
-                <div class="flex justify-between items-center p-4 border-b sticky top-0 bg-white z-10">
-                    <h3 class="text-xl font-semibold">Company Profile</h3>
-                    <button id="close-profile-modal" class="text-gray-500 hover:text-gray-800 text-3xl font-light">&times;</button>
-                </div>
-
-                <div class="p-4 flex-grow overflow-y-auto">
-                    <div class="space-y-4">
-                        <img src="img/company_profile/1.png" alt="page 1" class="w-full h-auto rounded shadow">
-                        <img src="img/company_profile/2.png" alt="page 2" class="w-full h-auto rounded shadow">
-                        <img src="img/company_profile/3.png" alt="page 3" class="w-full h-auto rounded shadow">
-                        <img src="img/company_profile/4.png" alt="page 4" class="w-full h-auto rounded shadow">
-                        <img src="img/company_profile/5.png" alt="page 5" class="w-full h-auto rounded shadow">
-                        <img src="img/company_profile/6.png" alt="page 6" class="w-full h-auto rounded shadow">
-                        <img src="img/company_profile/7.png" alt="page 7" class="w-full h-auto rounded shadow">
-                        <img src="img/company_profile/8.png" alt="page 8" class="w-full h-auto rounded shadow">
-                        <img src="img/company_profile/9.png" alt="page 9" class="w-full h-auto rounded shadow">
-                        <img src="img/company_profile/10.png" alt="page 10" class="w-full h-auto rounded shadow">
-                        <img src="img/company_profile/11.png" alt="page 11" class="w-full h-auto rounded shadow">
-                        <img src="img/company_profile/12.png" alt="page 12" class="w-full h-auto rounded shadow">
-                        <img src="img/company_profile/13.png" alt="page 13" class="w-full h-auto rounded shadow">
-                        <img src="img/company_profile/14.png" alt="page 14" class="w-full h-auto rounded shadow">
-                        <img src="img/company_profile/15.png" alt="page 15" class="w-full h-auto rounded shadow">
-                        <img src="img/company_profile/16.png" alt="page 16" class="w-full h-auto rounded shadow">
-                        <img src="img/company_profile/17.png" alt="page 17" class="w-full h-auto rounded shadow">
-                        <img src="img/company_profile/18.png" alt="page 18" class="w-full h-auto rounded shadow">
-                        <img src="img/company_profile/19.png" alt="page 19" class="w-full h-auto rounded shadow">
-                        <img src="img/company_profile/20.png" alt="page 20" class="w-full h-auto rounded shadow">
-                        <img src="img/company_profile/21.png" alt="page 21" class="w-full h-auto rounded shadow">
-                        <img src="img/company_profile/22.png" alt="page 22" class="w-full h-auto rounded shadow">
-                        <img src="img/company_profile/23.png" alt="page 23" class="w-full h-auto rounded shadow">
-                        <img src="img/company_profile/24.png" alt="page 24" class="w-full h-auto rounded shadow">
-                        <img src="img/company_profile/25.png" alt="page 25" class="w-full h-auto rounded shadow">
-                        <img src="img/company_profile/26.png" alt="page 26" class="w-full h-auto rounded shadow">
-                        <img src="img/company_profile/27.png" alt="page 27" class="w-full h-auto rounded shadow">
-                        <img src="img/company_profile/28.png" alt="page 28" class="w-full h-auto rounded shadow">
-                        <img src="img/company_profile/29.png" alt="page 29" class="w-full h-auto rounded shadow">
-                        <img src="img/company_profile/30.png" alt="page 30" class="w-full h-auto rounded shadow">
-                        <img src="img/company_profile/31.png" alt="page 31" class="w-full h-auto rounded shadow">
-                        <img src="img/company_profile/32.png" alt="page 32" class="w-full h-auto rounded shadow">
-                        <img src="img/company_profile/33.png" alt="page 33" class="w-full h-auto rounded shadow">
-                        <img src="img/company_profile/34.png" alt="page 34" class="w-full h-auto rounded shadow">
-                        <img src="img/company_profile/35.png" alt="page 35" class="w-full h-auto rounded shadow">
-
-                </div>
-                </div>
-            </div>
-        </div>
 
         <footer class="bg-gray-800 text-white py-12">
             <div class="container mx-auto px-6">
@@ -257,34 +194,7 @@
             });
         });
 
-        // Company Profile Modal Logic
-        const openProfileBtn = document.getElementById('open-profile-modal');
-        const closeProfileBtn = document.getElementById('close-profile-modal');
-        const profileModal = document.getElementById('profile-modal');
-
-        if (openProfileBtn && profileModal) {
-            openProfileBtn.addEventListener('click', () => {
-                profileModal.classList.remove('hidden');
-                document.body.style.overflow = 'hidden'; // Prevent background scrolling
-            });
-        }
-
-        if (closeProfileBtn && profileModal) {
-            closeProfileBtn.addEventListener('click', () => {
-                profileModal.classList.add('hidden');
-                document.body.style.overflow = ''; // Restore background scrolling
-            });
-        }
-
-        // Close modal by clicking on the background overlay
-        if (profileModal) {
-            profileModal.addEventListener('click', (e) => {
-                if (e.target === profileModal) {
-                    profileModal.classList.add('hidden');
-                    document.body.style.overflow = '';
-                }
-            });
-        }
+        
     </script>
 
 </body>

@@ -6,7 +6,7 @@ include 'config.php'; // Your database connection
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Legasi Futura</title>
+    <title>LFSB - Admin Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
@@ -128,19 +128,19 @@ include 'config.php'; // Your database connection
                 <div class="form-group">
                     <label for="addProgressStatus">Progress Status</label>
                     <select id="addProgressStatus" required>
-                         <option value="PO Received">PO Received</option>
-                        <option value="Submission GA Drawing to client">Submission GA Drawing to client</option>
+                         <option value="Purchase Order (PO) received">Purchase Order (PO) received</option>
+                        <option value="Submission GA Drawing to client">Submission General Arrangement Drawing (GAD) to client</option>
+                        <option value="Awaiting drawing approval from client">Awaiting drawing approval from client</option>
                         <option value="Kick off meeting">Kick off meeting</option>
                         <option value="Procurement and purchasing of materials">Procurement and purchasing of materials</option>
                         <option value="Drawing approve by client">Drawing approval by client</option>
                         <option value="Fabrication start">Fabrication in progress</option>
                         <option value="Valve assembly, pre testing">Valve assembly, pre testing</option>
-                        <option value="FAT in Progress">FAT in Progress</option>
-                        <option value="FAT with TPI">FAT with TPI</option>
+                        <option value="Factory Acceptance Test (FAT) with Third Party Inspector (TPI) in progress"> Factory Acceptance Test (FAT) with Third Party Inspector (TPI) in progress</option>
                         <option value="Painting and coating in progress">Painting and coating in progress</option>
                         <option value="Packing and delivery arrangement">Packing and delivery arrangement</option>
                         <option value="Arrival at location with customs clearance">Arrival at location with customs clearance</option>
-                        <option value="SAT in progress">SAT in progress</option>
+                        <option value="Site Acceptance Test (SAT) in progress">Site Acceptance Test (SAT) in progress</option>
                         <option value="Delivery to client's yard">Delivery to client's yard</option>
                         <option value="Delivered">Delivered</option>
                     </select>

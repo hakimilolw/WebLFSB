@@ -1,14 +1,31 @@
 <?php
-include 'config.php'; // Your database connection
+// --- DEBUGGING: These lines will display any PHP errors on the page ---
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+// This line helps confirm the script is starting
+// echo "DEBUG: Script execution started.<br>";
+
+// The rest of your PHP code will now run, and any fatal error will be displayed.
+include 'config.php'; 
+
+// Check if the database connection was successful
+if ($conn->connect_error) {
+  die("Connection failed: " . $conn->connect_error);
+}
 
 $shareable_id = isset($_GET['id']) ? $_GET['id'] : '';
 $item_details = null;
 $progress_history = [];
-$latest_progress = "Awaiting Progress"; // Default status
+$latest_progress = "Awaiting Progress";
 
 if (!empty($shareable_id)) {
-    // Fetch the main item details using the shareable ID
     $stmt = $conn->prepare("SELECT id, item_name, item_id, client FROM items WHERE shareable_id = ?");
+    if ($stmt === false) {
+        die("Prepare failed: (" . $conn->errno . ") " . $conn->error);
+    }
+
     $stmt->bind_param("s", $shareable_id);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -17,21 +34,24 @@ if (!empty($shareable_id)) {
         $item_details = $result->fetch_assoc();
         $item_internal_id = $item_details['id'];
 
-        // Fetch the progress history for that item using the internal id
         $stmt_progress = $conn->prepare(
             "SELECT progress, description, date, time, image_path FROM progress 
              WHERE item_primary_id = ?
              ORDER BY date DESC, time DESC"
         );
+        if ($stmt_progress === false) {
+            die("Prepare failed for progress: (" . $conn->errno . ") " . $conn->error);
+        }
+
         $stmt_progress->bind_param("i", $item_internal_id);
         $stmt_progress->execute();
         $progress_result = $stmt_progress->get_result();
+        
         while ($row = $progress_result->fetch_assoc()) {
             $progress_history[] = $row;
         }
         $stmt_progress->close();
 
-        // Get the latest progress status if history exists
         if (!empty($progress_history)) {
             $latest_progress = htmlspecialchars($progress_history[0]['progress']);
         }
@@ -45,12 +65,13 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Item Progress Tracker - Legasi Futura</title>
+    <title>LFSB - Item and Inventory Tracking</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-        <style>
+    <link rel="icon" href="img/logo_only.png" type="image/png">
+    <style>
         body {
             font-family: 'Inter', sans-serif;
         }
@@ -70,7 +91,6 @@ $conn->close();
         .timeline-item { position: relative; margin-bottom: 30px; padding-left: 70px; }
         .timeline-item:last-child { margin-bottom: 0; }
 
-        /* This rule now draws a line that extends into the margin below the item to connect with the next one */
         .timeline-item::before {
             content: '';
             background-color: #ddd;
@@ -82,13 +102,11 @@ $conn->close();
             z-index: 1;
         }
 
-        /* For the FIRST item, the line starts at the icon's center */
         .timeline-item:first-child::before {
             top: 20px;
             height: calc(100% + 10px); /* Adjust height to account for new top position */
         }
 
-        /* For the LAST item, the line stops at the icon's center */
         .timeline-item:last-child::before {
             height: 20px;
         }
@@ -102,10 +120,9 @@ $conn->close();
             border-radius: 50%; 
             background: #fff; 
             border: 3px solid #f2a202; 
-            z-index: 10; /* Ensures icon is on top of the line */
+            z-index: 10;
         }
 
-        /* Upward pointing arrow on the icon */
         .timeline-icon::after {
             content: '';
             position: absolute;
@@ -152,7 +169,7 @@ $conn->close();
 </head>
 <body class="bg-white text-gray-800">
 
-    <header id="main-header" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-black/30 backdrop-blur-sm">
+    <header id="main-header" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-black">
         <div class="container mx-auto px-6 py-4">
             <div class="flex items-center justify-between">
                 <a href="index.html" class="flex items-center space-x-2">
@@ -166,19 +183,24 @@ $conn->close();
                             <svg class="w-4 h-4 transition-transform duration-300 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                         </button>
                         <div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-black/80 backdrop-blur-sm rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 invisible group-hover:visible pt-2 pb-2">
-                            <a href="who-we-are.html" class="block w-full text-left px-4 py-2 text-sm text-white/90 hover:bg-gray-700/50 hover:text-white">Overview</a>
                             <a href="vision-mission.html" class="block w-full text-left px-4 py-2 text-sm text-white/90 hover:bg-gray-700/50 hover:text-white">Vision & Mission</a>
                             <a href="policies.html" class="block w-full text-left px-4 py-2 text-sm text-white/90 hover:bg-gray-700/50 hover:text-white">Our Policies</a>
                             <a href="cert.html" class="block w-full text-left px-4 py-2 text-sm text-white/90 hover:bg-gray-700/50 hover:text-white">Certification</a>
                             <a href="track-record.html" class="block w-full text-left px-4 py-2 text-sm text-white/90 hover:bg-gray-700/50 hover:text-white">Track Record</a>
                         </div>
                     </div>
-                    <a href="what-we-do.html" class="text-white/90 uppercase text-sm font-medium tracking-wider transition-colors duration-300 hover:text-white">What We Do</a>
+                    <div class="relative group">
+                        <button class="flex items-center space-x-1 text-white/90 uppercase text-sm font-medium tracking-wider transition-colors duration-300 hover:text-white">
+                            <span>What We Do</span>
+                            <svg class="w-4 h-4 transition-transform duration-300 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                        <div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-black/80 backdrop-blur-sm rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 invisible group-hover:visible pt-2 pb-2">
+                            <a href="what-we-do.html" class="block w-full text-left px-4 py-2 text-sm text-white/90 hover:bg-gray-700/50 hover:text-white">Overview</a>
+                            <a href="gallery.html" class="block w-full text-left px-4 py-2 text-sm text-white/90 hover:bg-gray-700/50 hover:text-white">Gallery</a>
+                        </div>
+                    </div>
                     <a href="contact-us.html" class="text-white/90 uppercase text-sm font-medium tracking-wider transition-colors duration-300 hover:text-white">Contact Us</a>
                     <a href="career-internship.html" class="text-white/90 uppercase text-sm font-medium tracking-wider transition-colors duration-300 hover:text-white">Career / Internship</a>
-                    <button class="text-white/90 hover:text-white transition-colors duration-300">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                    </button>
                 </nav>
                 <div class="lg:hidden flex items-center space-x-4">
                      <button class="text-white/90 hover:text-white transition-colors duration-300">
@@ -197,15 +219,28 @@ $conn->close();
     <div id="mobile-menu" class="hidden lg:hidden fixed inset-0 bg-gray-900/95 backdrop-blur-md z-40 pt-24">
         <nav class="flex flex-col items-center space-y-8">
             <a href="index.html" class="text-white/90 uppercase text-lg font-medium tracking-wider transition-colors duration-300 hover:text-white">Home</a>
-            <a href="who-we-are.html" class="text-white/90 uppercase text-lg font-medium tracking-wider transition-colors duration-300 hover:text-white">Who We Are</a>
-            <div class="-mt-6 pl-4">
-                <a href="who-we-are.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Overview</a><br>
-                <a href="vision-mission.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Vision & Mission</a><br>
-                <a href="policies.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Our Policies</a><br>
-                <a href="cert.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Certification</a><br>
-                <a href="track-record.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Track Record</a>
+            <div class="w-full text-center">
+                <button class="mobile-menu-toggle text-white/90 uppercase text-lg font-medium tracking-wider transition-colors duration-300 hover:text-white inline-flex items-center">
+                    <span>Who We Are</span>
+                    <svg class="w-5 h-5 ml-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </button>
+                <div class="mobile-submenu hidden flex flex-col items-center space-y-4 pt-4">
+                    <a href="vision-mission.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Vision & Mission</a>
+                    <a href="policies.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Our Policies</a>
+                    <a href="cert.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Certification</a>
+                    <a href="track-record.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Track Record</a>
+                </div>
             </div>
-            <a href="what-we-do.html" class="text-white/90 uppercase text-lg font-medium tracking-wider transition-colors duration-300 hover:text-white">What We Do</a>
+            <div class="w-full text-center">
+                <button class="mobile-menu-toggle text-white/90 uppercase text-lg font-medium tracking-wider transition-colors duration-300 hover:text-white inline-flex items-center">
+                    <span>What We Do</span>
+                    <svg class="w-5 h-5 ml-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </button>
+                <div class="mobile-submenu hidden flex flex-col items-center space-y-4 pt-4">
+                    <a href="what-we-do.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Overview</a>
+                    <a href="gallery.html" class="text-white/70 uppercase text-base font-medium tracking-wider transition-colors duration-300 hover:text-white">Gallery</a>
+                </div>
+            </div>
             <a href="contact-us.html" class="text-white/90 uppercase text-lg font-medium tracking-wider transition-colors duration-300 hover:text-white">Contact Us</a>
             <a href="career-internship.html" class="text-white/90 uppercase text-lg font-medium tracking-wider transition-colors duration-300 hover:text-white">Career / Internship</a>
         </nav>
@@ -259,7 +294,7 @@ $conn->close();
             </div>
             </main>
 
-        <footer class="bg-gray-800 text-white py-12">
+        <footer class="bg-gray-800 text-white py-8">
             <div class="container mx-auto px-6">
                 <div class="text-center md:text-left">
                     <div class="mb-6 md:mb-0">
@@ -268,11 +303,11 @@ $conn->close();
                         <p class="text-sm text-gray-400">Jalan Saberkas Utama, Jalan Pujut-Lutong,</p>
                         <p class="text-sm text-gray-400">98000 Miri, Sarawak, Malaysia.</p>
                         <div class="flex space-x-4 mt-4 justify-center md:justify-start">
-                            <a href="https://www.linkedin.com/company/legasifutura/" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-white transition-colors duration-300">
+                            <a href="https://www.linkedin.com/company/legasifutura/" class="text-gray-400 hover:text-white transition-colors duration-300">
                                 <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" clip-rule="evenodd"/></svg>
                             </a>
-                            <a href="https://www.facebook.com/p/Legasi-Futura-100094370892508/" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-white transition-colors duration-300">
-                               <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"/></svg>
+                            <a href="https://www.facebook.com/p/Legasi-Futura-100094370892508/" class="text-gray-400 hover:text-white transition-colors duration-300">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"/></svg>
                             </a>
                         </div>
                     </div>
@@ -284,6 +319,7 @@ $conn->close();
         </div>
     </div>
 
+    <!-- Image Modal -->
     <div id="image-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-[100] p-4">
         <div class="bg-white p-2 rounded-lg shadow-xl max-w-4xl max-h-[90vh] relative">
             <button id="close-image-modal" class="absolute -top-3 -right-3 bg-gray-700 text-white rounded-full p-2 z-10 hover:bg-black transition-colors duration-200">
@@ -380,4 +416,4 @@ $conn->close();
     </script>
 
 </body>
-</html>
+</ht

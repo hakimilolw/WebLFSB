@@ -21,6 +21,11 @@
             color: white;
             border-color: #3b82f6; /* lighter blue */
         }
+        /* Style for disabled buttons */
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 <body class="bg-white text-gray-800">
@@ -58,9 +63,6 @@
                     </div>
                     <a href="contact-us.html" class="text-white/90 uppercase text-sm font-medium tracking-wider transition-colors duration-300 hover:text-white">Contact Us</a>
                     <a href="career-internship.html" class="text-white/90 uppercase text-sm font-medium tracking-wider transition-colors duration-300 hover:text-white">Career / Internship</a>
-                    <button class="text-white/90 hover:text-white transition-colors duration-300">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                    </button>
                 </nav>
                 <div class="lg:hidden flex items-center space-x-4">
                      <button class="text-white/90 hover:text-white transition-colors duration-300">
@@ -120,10 +122,11 @@
                 <aside class="md:col-span-1">
                     <ul id="service-tabs" class="space-y-2">
                         <li><button class="service-tab w-full text-left p-4 rounded-lg font-semibold border-l-4 border-transparent transition-colors duration-300 active" data-target="#ai-content">AI Solutions</button></li>
-                        <li><button class="service-tab w-full text-left p-4 rounded-lg font-semibold border-l-4 border-transparent transition-colors duration-300" data-target="#pipeline-content">Pipeline Inspection</button></li>
+                        <li><button class="service-tab w-full text-left p-4 rounded-lg font-semibold border-l-4 border-transparent transition-colors duration-300" data-target="#asset-content">Asset Integrity Management</button></li>
                         <li><button class="service-tab w-full text-left p-4 rounded-lg font-semibold border-l-4 border-transparent transition-colors duration-300" data-target="#hse-content">HSE Equipment Rental</button></li>
-                        <li><button class="service-tab w-full text-left p-4 rounded-lg font-semibold border-l-4 border-transparent transition-colors duration-300" data-target="#material-content">Material Supply</button></li>
                         <li><button class="service-tab w-full text-left p-4 rounded-lg font-semibold border-l-4 border-transparent transition-colors duration-300" data-target="#manpower-content">Manpower Supply</button></li>
+                        <li><button class="service-tab w-full text-left p-4 rounded-lg font-semibold border-l-4 border-transparent transition-colors duration-300" data-target="#material-content">Material Supply</button></li>
+                        <li><button class="service-tab w-full text-left p-4 rounded-lg font-semibold border-l-4 border-transparent transition-colors duration-300" data-target="#pipeline-content">Pipeline Inspection</button></li>
                     </ul>
                 </aside>
 
@@ -135,9 +138,37 @@
                             <div class="lg:col-span-3">
                                 <h2 class="text-3xl font-bold text-gray-800">HybriDenSafe</h2>
                                 <p class="mt-4 text-gray-600">Our HybriDenSafe system is a scenario-based video analytics solution designed for robust monitoring of industrial operations. It features over 20 pre-built, configurable AI modules to cover 90% of common use cases, enhancing hazard detection by 7x and enabling 24/7 automated site monitoring.</p>
-                                <button data-pdf-src="pdf/brochures/LFSB - AI HybriDenSafe Brochure.pdf" class="brochure-modal-trigger mt-4 inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-300">
-                                    See More <i class="fa fa-external-link ml-1"></i>
-                                </button>
+                                <div class="mt-4 flex items-center space-x-4">
+                                    <button data-pdf-src="pdf/brochures/LFSB - AI HybriDenSafe Brochure.pdf" class="brochure-modal-trigger inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-300">
+                                        See More <i class="fa fa-external-link ml-1"></i>
+                                    </button>
+                                    <button data-video-url="" class="video-modal-trigger inline-block bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-300" disabled>
+                                        See Video <i class="fa fa-video-camera ml-1"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="asset-content" class="service-panel hidden">
+                        <h2 class="text-3xl font-bold text-gray-800 mb-6">Asset Integrity Management</h2>
+                        <div class="space-y-12">
+                            <div>
+                                <h3 class="text-2xl font-semibold text-blue-900 mb-4">CorrosionRadar</h3>
+                                <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 items-center">
+                                    <div class="lg:col-span-2"><img src="img/services/CorrosionRadar.jpeg" alt="CorrosionRadar" class="rounded-lg shadow-md w-full"></div>
+                                    <div class="lg:col-span-3">
+                                        <p class="text-gray-600">CorrosionRADAR remotely can detect, monitor & predict CUI on the asset through its IoT platform of a combined moisture and corrosion sensing system.</p>
+                                        <div class="mt-4 flex items-center space-x-4">
+                                            <button data-pdf-src="pdf/brochures/LFSB - Corosion Radar Brochure.pdf" class="brochure-modal-trigger inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-300">
+                                                See More <i class="fa fa-external-link ml-1"></i>
+                                            </button>
+                                            <button data-video-url="https://www.youtube.com/embed/OkGmIfIWjp4?si=KYayimShBsKVnkvU" class="video-modal-trigger inline-block bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-300">
+                                                See Video <i class="fa fa-video-camera ml-1"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -151,9 +182,14 @@
                                     <div class="lg:col-span-2"><img src="img/services/mtmg.jpg" alt="MTM-G Technology" class="rounded-lg shadow-md w-full"></div>
                                     <div class="lg:col-span-3">
                                         <p class="text-gray-600">This non-contact solution monitors the real condition of pipelines by measuring their magnetic field strength. It effectively locates stress concentration areas, assessing danger levels for aboveground, underground, and underwater pipelines without service interruption.</p>
-                                        <button data-pdf-src="pdf/brochures/LFSB - MTM-G Technology Brochure.pdf" class="brochure-modal-trigger mt-4 inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-300">
-                                            See More <i class="fa fa-external-link ml-1"></i>
-                                        </button>
+                                        <div class="mt-4 flex items-center space-x-4">
+                                            <button data-pdf-src="pdf/brochures/LFSB - MTM-G Technology Brochure.pdf" class="brochure-modal-trigger inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-300">
+                                                See More <i class="fa fa-external-link ml-1"></i>
+                                            </button>
+                                            <button data-video-url="" class="video-modal-trigger inline-block bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-300" disabled>
+                                                See Video <i class="fa fa-video-camera ml-1"></i>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -163,21 +199,14 @@
                                     <div class="lg:col-span-2 lg:order-last"><img src="img/services/electro_scan.png" alt="Electro Scan Technology" class="rounded-lg shadow-md w-full"></div>
                                     <div class="lg:col-span-3">
                                         <p class="text-gray-600">Using electrical current, this technology accurately detects and measures all pipe defects, including those hidden in joints and cracks. It rapidly pinpoints the exact location and size of leaks, and can even identify illegal water pipe connections.</p>
-                                        <button data-pdf-src="pdf/brochures/LFSB - Electro Scan - Leak Detection Technology Brochure.pdf" class="brochure-modal-trigger mt-4 inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-300">
-                                            See More <i class="fa fa-external-link ml-1"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div>
-                                <h3 class="text-2xl font-semibold text-blue-900 mb-4">CorrosionRadar</h3>
-                                <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 items-center">
-                                    <div class="lg:col-span-2"><img src="img/services/CorrosionRadar.jpeg" alt="CorrosionRadar" class="rounded-lg shadow-md w-full"></div>
-                                    <div class="lg:col-span-3">
-                                        <p class="text-gray-600"> CorrosionRADAR remotely can detect, monitor & predict CUI on the asset through its IoT platform of a combined moisture and corrosion sensing system</p>
-                                        <button data-pdf-src="pdf/brochures/LFSB - Corosion Radar Brochure.pdf" class="brochure-modal-trigger mt-4 inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-300">
-                                            See More <i class="fa fa-external-link ml-1"></i>
-                                        </button>
+                                        <div class="mt-4 flex items-center space-x-4">
+                                            <button data-pdf-src="pdf/brochures/LFSB - Electro Scan - Leak Detection Technology Brochure.pdf" class="brochure-modal-trigger inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-300">
+                                                See More <i class="fa fa-external-link ml-1"></i>
+                                            </button>
+                                            <button data-video-url="https://www.youtube.com/embed/5_lPdEUjykY?si=GhhHlgMJJBp7Pkmz" class="video-modal-trigger inline-block bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-300">
+                                                See Video <i class="fa fa-video-camera ml-1"></i>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -190,9 +219,11 @@
                             <div class="lg:col-span-3">
                                 <h2 class="text-3xl font-bold text-gray-800">HSE Safety Equipment Rental</h2>
                                 <p class="mt-4 text-gray-600">We provide cost-effective and flexible rental solutions for critical safety equipment, backed by strong local support and a commitment to compliance. Our offerings include personal gas detectors and Emergency Escape Breathing Devices (EEBD).</p>
-                                <button data-pdf-src="pdf/brochures/LFSB - H2S Safety Equipment Rental Brochure.pdf" class="brochure-modal-trigger mt-4 inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-300">
-                                    See More <i class="fa fa-external-link ml-1"></i>
-                                </button>
+                                <div class="mt-4 flex items-center space-x-4">
+                                    <button data-pdf-src="pdf/brochures/LFSB - H2S Safety Equipment Rental Brochure.pdf" class="brochure-modal-trigger inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-300">
+                                        See More <i class="fa fa-external-link ml-1"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -210,9 +241,11 @@
                                     <li><strong>Line Pipes:</strong> Various grades and sizes for diverse applications, including different materials and manufacturing processes.</li>
                                     <li><strong>Corrosion Monitoring Equipment:</strong> Including items such as probes, and related accessories for asset integrity.</li>
                                 </ul>
-                                <button data-pdf-src="pdf/brochures/LFSB - Valve Brochure.pdf" class="brochure-modal-trigger mt-6 inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-300">
-                                    See More <i class="fa fa-external-link ml-1"></i>
-                                </button>
+                                <div class="mt-6 flex items-center space-x-4">
+                                    <button data-pdf-src="pdf/brochures/LFSB - Valve Brochure.pdf" class="brochure-modal-trigger inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-300">
+                                        See More <i class="fa fa-external-link ml-1"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -253,11 +286,6 @@
         </div>
     </main>
 
-
-
-
-
-
     <footer class="bg-gray-800 text-white py-12">
         <div class="container mx-auto px-6">
             <div class="text-center md:text-left">
@@ -288,13 +316,21 @@
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
     </a>
 
-    <!-- Brochure Modal -->
     <div id="brochure-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-[100] p-4">
         <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl h-[90vh] relative">
             <button id="close-brochure-modal" class="absolute -top-3 -right-3 bg-gray-700 text-white rounded-full p-2 z-10 hover:bg-black transition-colors duration-200">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
             <iframe id="modal-brochure-pdf" src="" class="w-full h-full" title="Brochure PDF"></iframe>
+        </div>
+    </div>
+    
+    <div id="video-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-[100] p-4">
+        <div class="bg-black rounded-lg shadow-xl w-full max-w-4xl h-[80vh] relative">
+            <button id="close-video-modal" class="absolute -top-3 -right-3 bg-gray-700 text-white rounded-full p-2 z-10 hover:bg-black transition-colors duration-200">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <iframe id="modal-video-iframe" class="w-full h-full" src="" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
         </div>
     </div>
 
@@ -377,7 +413,7 @@
     const modalBrochurePdf = document.getElementById('modal-brochure-pdf');
     const openBrochureModalBtns = document.querySelectorAll('.brochure-modal-trigger');
 
-    // This function shows the modal (for desktop)
+    // This function shows the brochure modal (for desktop)
     const showBrochureModal = (pdfSrc) => {
         if (pdfSrc) {
             modalBrochurePdf.src = pdfSrc;
@@ -388,7 +424,7 @@
         }
     };
     
-    // This function hides the modal (for desktop)
+    // This function hides the brochure modal (for desktop)
     const hideBrochureModal = () => {
         brochureModal.classList.add('hidden');
         modalBrochurePdf.src = '';
@@ -413,7 +449,6 @@
             }
         });
     });
-
     
     closeBrochureModalBtn.addEventListener('click', hideBrochureModal);
 
@@ -423,9 +458,55 @@
         }
     });
 
+    // --- Video Modal Script ---
+    const videoModal = document.getElementById('video-modal');
+    const closeVideoModalBtn = document.getElementById('close-video-modal');
+    const modalVideoIframe = document.getElementById('modal-video-iframe');
+    const openVideoModalBtns = document.querySelectorAll('.video-modal-trigger');
+
+    const showVideoModal = (videoUrl) => {
+        if (videoUrl) {
+            modalVideoIframe.src = videoUrl;
+            videoModal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            if (whatsappBtn) whatsappBtn.style.display = 'none';
+            if (backToTopBtn) backToTopBtn.style.display = 'none';
+        }
+    };
+
+    const hideVideoModal = () => {
+        videoModal.classList.add('hidden');
+        modalVideoIframe.src = ''; 
+        document.body.style.overflow = 'auto';
+        if (whatsappBtn) whatsappBtn.style.display = 'block';
+        if (backToTopBtn) backToTopBtn.style.display = 'block';
+    };
+
+    openVideoModalBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const videoUrl = btn.dataset.videoUrl;
+            showVideoModal(videoUrl);
+        });
+    });
+    
+    closeVideoModalBtn.addEventListener('click', hideVideoModal);
+
+    videoModal.addEventListener('click', (e) => {
+        if (e.target.id === 'video-modal') {
+            hideVideoModal();
+        }
+    });
+    
+    // --- Close Modals with Escape Key ---
     document.addEventListener('keydown', (e) => {
-        if (e.key === "Escape" && !brochureModal.classList.contains('hidden')) {
-            hideBrochureModal();
+        if (e.key === "Escape") {
+            if (!brochureModal.classList.contains('hidden')) {
+                hideBrochureModal();
+            }
+            if (!videoModal.classList.contains('hidden')) {
+                hideVideoModal();
+            }
         }
     });
 </script>

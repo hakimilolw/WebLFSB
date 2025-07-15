@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Item and Inventory Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7f6; /* A slightly off-white background for a cleaner look */
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        #main-container {
+            flex-grow: 1;
+        }
+        /* --- Styles for Item Tracking Dashboard --- */
+        .dashboard-container { max-width: 1100px; margin: 40px auto; } /* Added more top margin */
+        .dashboard { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .dashboard table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .dashboard th, .dashboard td { padding: 12px; border: 1px solid #ddd; text-align: left; }
+        .dashboard th { background-color: #f2f2f2; }
+        .dashboard .actions a { margin-right: 10px; text-decoration: none; cursor: pointer; font-size: 1.2em; }
+        .btn { padding: 10px 15px; background-color: #5cb85c; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); }
+        .modal-content { background-color: #fefefe; margin: 10% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 600px; border-radius: 8px; }
+        .modal .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; }
+        .modal .close:hover, .modal .close:focus { color: black; text-decoration: none; cursor: pointer; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; }
+        .form-group input, .form-group select, .form-group textarea { width: 95%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+        
+        .timeline { position: relative; list-style: none; padding: 0; margin-top: 20px; }
+        .timeline-item { position: relative; margin-bottom: 20px; padding-left: 60px; }
+        .timeline-item:last-child { margin-bottom: 0; }
+
+        .timeline-item::before {
+            content: '';
+            background-color: #ddd;
+            position: absolute;
+            width: 2px;
+            top: 0;
+            left: 19px;
+            height: calc(100% + 20px);
+            z-index: 1;
+        }
+
+        .timeline-item:first-child::before {
+            top: 20px;
+            height: 100%;
+        }
+
+        .timeline-item:last-child::before {
+            height: 20px;
+        }
+        
+        .timeline-icon { 
+            position: absolute; 
+            left: 0px; 
+            top: 0; 
+            width: 40px; 
+            height: 40px; 
+            border-radius: 50%; 
+            background: #fff; 
+            border: 3px solid #f2a202; 
+            z-index: 10;
+        }
+        .timeline-item.delivered .timeline-icon { background: #28a745; border-color: #28a745; color: white; display: flex; align-items: center; justify-content: center; font-size: 1.5em; }
+        .timeline-item.delivered .timeline-icon:before { content: '✔'; }
+        .timeline-body { position: relative; top: -5px; }
+        .timeline-body .time { font-size: 0.9em; color: #888; margin-bottom: 5px; }
+        .timeline-body h4 { margin: 0 0 5px 0; font-size: 1.1em; }
+        .timeline-body p { margin: 0; color: #666; font-size: 1em; }
+
+        #notification {
+            position: fixed;
+            top: 20px; /* Adjusted for no header */
+            right: 20px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: visibility 0s 0.5s, opacity 0.5s linear;
+        }
+        #notification.show {
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.5s linear;
+        }
+
+        /* --- Responsive Styles for Mobile --- */
+        @media screen and (max-width: 768px) {
+            .dashboard-container {
+                margin: 10px auto;
+            }
+            .dashboard table thead {
+                display: none;
+            }
+            .dashboard table, .dashboard table tbody, .dashboard table tr, .dashboard table td {
+                display: block;
+                width: 100%;
+            }
+            .dashboard table tr {
+                margin-bottom: 15px;
+                border: 1px solid #ddd;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            }
+            .dashboard table td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 12px 15px;
+                border: none;
+                border-bottom: 1px solid #eee;
+                text-align: right;
+            }
+            .dashboard table tr td:last-child {
+                border-bottom: none;
+            }
+            .dashboard table td::before {
+                content: attr(data-label);
+                font-weight: bold;
+                padding-right: 1em;
+                text-align: left;
+            }
+            .dashboard td.actions {
+                justify-content: center;
+            }
+            .dashboard td.actions::before {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <div id="main-container">
+        <main class="py-10">
+            <div id="notification"></div>
+            <div class="dashboard-container">
+                <div class="dashboard">
+                    <h2 class="text-4xl font-bold text-center text-gray-800 mb-8">Item and Inventory Tracker</h2>
+                    <div class="flex justify-end mb-4">
+                        <button class="btn" id="addNewItemBtn">Add new item</button>
+                    </div>
+                    <table id="itemTable">
+                        <thead>
+                            <tr>
+                                <th>Item Name</th>
+                                <th>Item ID</th>
+                                <th>Client</th>
+                                <th>Progress</th>
+                                <th>ETA</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Simplified Footer -->
+    <footer class="text-center text-white text-sm py-6 bg-black">
+        &copy; 2025 Legasi Futura Sdn. Bhd. All rights reserved.
+    </footer>
+
+    <!-- Modals -->
+    <div id="addItemModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Add New Item</h3>
+            <form id="addItemForm"> 
+                <div class="form-group"><label for="itemName">Item Name</label><input type="text" id="itemName" required></div> 
+                <div class="form-group"><label for="itemId">Item ID</label><input type="text" id="itemId" required></div> 
+                <div class="form-group"><label for="client">Client</label><input type="text" id="client" required></div> 
+                <div class="form-group"><label for="eta">ETA</label><input type="text" id="eta" required></div>
+                <button type="submit" class="btn">Submit</button>
+            </form>
+        </div>
+    </div>
+    <div id="editItemModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Edit Item</h3>
+            <form id="editItemForm">
+                <input type="hidden" id="editItemRowId">
+                <div class="form-group"><label for="editItemName">Item Name</label><input type="text" id="editItemName" required></div> 
+                <div class="form-group"><label for="editItemIdNo">Item ID</label><input type="text" id="editItemIdNo" required></div> 
+                <div class="form-group"><label for="editClient">Client</label><input type="text" id="editClient" required></div> 
+                <div class="form-group">
+                    <label for="editProgress">Progress</label>
+                    <select id="editProgress" required>
+                        <option value="PO Received">PO Received</option>
+                        <option value="Submission GA Drawing to client">Submission GA Drawing to client</option>
+                        <option value="Kick off meeting">Kick off meeting</option>
+                        <option value="Procurement and purchasing of materials">Procurement and purchasing of materials</option>
+                        <option value="Drawing approve by client">Drawing approval by client</option>
+                        <option value="Fabrication start">Fabrication in progress</option>
+                        <option value="Valve assembly, pre testing">Valve assembly, pre testing</option>
+                        <option value="FAT in Progress">FAT in Progress</option>
+                        <option value="FAT with TPI">FAT with TPI</option>
+                        <option value="Painting and coating in progress">Painting and coating in progress</option>
+                        <option value="Packing and delivery arrangement">Packing and delivery arrangement</option>
+                        <option value="Arrival at location with customs clearance">Arrival at location with customs clearance</option>
+                        <option value="SAT in progress">SAT in progress</option>
+                        <option value="Delivery to client's yard">Delivery to client's yard</option>
+                        <option value="Delivered">Delivered</option>
+                    </select>
+                </div>
+                <div class="form-group"><label for="editDescription">Description</label><textarea id="editDescription" rows="3"></textarea></div>
+                <div class="form-group"><label for="editDate">Date</label><input type="date" id="editDate" required></div>
+                <div class="form-group"><label for="editTime">Time</label><input type="time" id="editTime" required></div>
+                <div class="form-group"><label for="editProgressImage">Image (Optional)</label><input type="file" id="editProgressImage" name="progressImage" accept="image/*"></div>
+                <div class="form-group"><label for="editEta">ETA</label><input type="text" id="editEta" required></div>
+                <button type="submit" class="btn">Submit</button>
+            </form>
+        </div>
+    </div>
+    <div id="viewProgressModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3 id="progressModalTitle">Progress Timeline</h3>
+            <ul id="progressTimeline" class="timeline"></ul>
+        </div>
+    </div>
+
+    <script>
+        // Floating buttons and their JS have been removed.
+        
+        // --- Item Tracker JS ---
+        document.addEventListener('DOMContentLoaded', function() {
+            const itemTableBody = document.getElementById('itemTable').getElementsByTagName('tbody')[0];
+            const addItemModal = document.getElementById('addItemModal');
+            const editItemModal = document.getElementById('editItemModal');
+            const viewProgressModal = document.getElementById('viewProgressModal');
+            const addNewItemBtn = document.getElementById('addNewItemBtn');
+            const closeBtns = document.querySelectorAll('.modal .close');
+            const notification = document.getElementById('notification');
+
+            function showNotification(message) {
+                notification.textContent = message;
+                notification.classList.add('show');
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+
+            function getItems() {
+                fetch('api.php?path=items')
+                    .then(response => response.ok ? response.json() : Promise.reject('Failed to load items'))
+                    .then(data => {
+                        itemTableBody.innerHTML = '';
+                        if (data && data.length > 0) {
+                            data.forEach(item => {
+                                let row = itemTableBody.insertRow();
+                                row.setAttribute('data-id', item.id);
+                                row.setAttribute('data-share-id', item.shareable_id);
+                                row.innerHTML = `
+                                    <td data-label="Item Name">${item.item_name}</td>
+                                    <td data-label="Item ID">${item.item_id}</td>
+                                    <td data-label="Client">${item.client}</td>
+                                    <td data-label="Progress">${item.progress || 'N/A'}</td>
+                                    <td data-label="ETA">${item.eta}</td>
+                                    <td data-label="Action" class="actions">
+                                        <a href="#" class="view-progress" title="View Progress">&#128065;</a>
+                                        <a href="#" class="edit" title="Edit">&#9998;</a>
+                                        <a href="#" class="share" title="Copy Client URL">&#128279;</a>
+                                        <a href="#" class="delete" title="Delete">&#128465;</a>
+                                    </td>`;
+                            });
+                        }
+                    })
+                    .catch(error => console.error('Error fetching items:', error));
+            }
+
+            const closeAllModals = () => {
+                addItemModal.style.display = 'none';
+                editItemModal.style.display = 'none';
+                viewProgressModal.style.display = 'none';
+            };
+            addNewItemBtn.onclick = () => {
+                document.getElementById('addItemForm').reset();
+                addItemModal.style.display = 'block';
+            };
+            closeBtns.forEach(btn => btn.onclick = closeAllModals);
+            window.onclick = event => {
+                if (event.target.classList.contains('modal')) {
+                    closeAllModals();
+                }
+            };
+
+            document.getElementById('addItemForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const itemData = {
+                    itemName: document.getElementById('itemName').value,
+                    itemId: document.getElementById('itemId').value, 
+                    client: document.getElementById('client').value, 
+                    eta: document.getElementById('eta').value
+                };
+                fetch('api.php?path=addItem', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(itemData)
+                }).then(res => res.json()).then(data => {
+                    closeAllModals(); getItems(); showNotification(data.message || 'Item added!');
+                }).catch(err => console.error('Error:', err));
+            });
+
+            document.getElementById('editItemForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const id = document.getElementById('editItemRowId').value;
+                const formData = new FormData();
+
+                formData.append('itemName', document.getElementById('editItemName').value);
+                formData.append('itemId', document.getElementById('editItemIdNo').value);
+                formData.append('client', document.getElementById('editClient').value);
+                formData.append('progress', document.getElementById('editProgress').value);
+                formData.append('description', document.getElementById('editDescription').value);
+                formData.append('date', document.getElementById('editDate').value);
+                formData.append('time', document.getElementById('editTime').value);
+                formData.append('eta', document.getElementById('editEta').value);
+
+                const imageInput = document.getElementById('editProgressImage');
+                if (imageInput.files.length > 0) {
+                    formData.append('progressImage', imageInput.files[0]);
+                }
+
+                fetch(`api.php?path=updateItem/${id}`, {
+                    method: 'POST',
+                    body: formData
+                }).then(res => res.json()).then(data => {
+                    if (data.error) {
+                        showNotification('Error: ' + data.error);
+                    } else {
+                        closeAllModals(); getItems(); showNotification(data.message || 'Item updated!');
+                    }
+                }).catch(err => { console.error('Error:', err); showNotification('An unexpected error occurred.'); });
+            });
+
+            itemTableBody.addEventListener('click', function(e) {
+                const targetLink = e.target.closest('a');
+                if (!targetLink) return;
+                e.preventDefault();
+                const row = targetLink.closest('tr');
+                const id = row.getAttribute('data-id');
+                const shareId = row.getAttribute('data-share-id');
+
+                if (targetLink.classList.contains('view-progress')) {
+                    document.getElementById('progressModalTitle').textContent = `Progress for ${row.cells[0].innerText}`;
+                    const timeline = document.getElementById('progressTimeline');
+                    timeline.innerHTML = '<li>Loading...</li>';
+                    viewProgressModal.style.display = 'block';
+                    fetch(`api.php?path=progress/${id}`).then(res => res.ok ? res.json() : Promise.reject('Failed to load progress'))
+                    .then(progressData => {
+                        timeline.innerHTML = '';
+                        if (progressData && progressData.length > 0) {
+                            progressData.forEach(p => {
+                                const isDelivered = p.progress.toLowerCase() === 'delivered';
+                                const date = new Date(`${p.date}T${p.time}`).toLocaleDateString('en-GB');
+                                const time = new Date(`${p.date}T${p.time}`).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+                                const imageHtml = p.image_path ? `<p><img src="${p.image_path}" alt="Progress Image" style="max-width: 100%; margin-top: 10px; border-radius: 4px;"></p>` : '';
+                                timeline.innerHTML += `<li class="timeline-item ${isDelivered ? 'delivered' : ''}"><div class="timeline-icon"></div><div class="timeline-body"><div class="time">${date} ${time}</div><h4>${p.progress}</h4><p>${p.description}</p>${imageHtml}</div></li>`;
+                            });
+                        } else {
+                            timeline.innerHTML = '<li>No progress has been recorded for this item yet.</li>';
+                        }
+                    }).catch(err => { timeline.innerHTML = '<li>Could not load progress data.</li>'; console.error(err); });
+                }
+
+                if (targetLink.classList.contains('edit')) {
+                    document.getElementById('editItemForm').reset();
+                    document.getElementById('editItemRowId').value = id;
+                    document.getElementById('editItemName').value = row.cells[0].innerText;
+                    document.getElementById('editItemIdNo').value = row.cells[1].innerText;
+                    document.getElementById('editClient').value = row.cells[2].innerText;
+                    document.getElementById('editEta').value = row.cells[4].innerText;
+                    document.getElementById('editDate').valueAsDate = new Date();
+                    document.getElementById('editTime').value = new Date().toTimeString().slice(0, 5);
+                    editItemModal.style.display = 'block';
+                }
+
+                if (targetLink.classList.contains('share')) {
+                    const clientUrl = `${window.location.origin}${window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'))}/client_view.php?id=${shareId}`;
+                    navigator.clipboard.writeText(clientUrl).then(() => showNotification('Client view URL copied to clipboard!'));
+                }
+
+                if (targetLink.classList.contains('delete')) {
+                    if (confirm(`Are you sure you want to delete Item ID: ${row.cells[1].innerText}?`)) {
+                        fetch(`api.php?path=deleteItem/${id}`, { method: 'DELETE' }).then(res => res.json())
+                        .then((data) => { getItems(); showNotification(data.message || 'Item deleted!');
+                        }).catch(err => console.error('Error:', err));
+                    }
+                }
+            });
+            
+            getItems();
+        });
+    </script>
+
+</body>
+</html>

@@ -298,7 +298,6 @@ $conn->close();
             <div class="container mx-auto px-6">
                 <div class="text-center md:text-left">
                     <div class="mb-6 md:mb-0">
-                        <img src="img/logo.png" alt="Legasi Futura Logo" class="h-10 mx-auto md:mx-0">
                         <p class="text-sm text-gray-400 mt-4">1st Floor, Lot 2161 Block 5,</p>
                         <p class="text-sm text-gray-400">Jalan Saberkas Utama, Jalan Pujut-Lutong,</p>
                         <p class="text-sm text-gray-400">98000 Miri, Sarawak, Malaysia.</p>

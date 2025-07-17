@@ -1,20 +1,76 @@
+<?php
+// --- DEBUGGING: These lines will display any PHP errors on the page ---
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+// This line helps confirm the script is starting
+// echo "DEBUG: Script execution started.<br>";
+
+// The rest of your PHP code will now run, and any fatal error will be displayed.
+include 'config.php'; 
+
+// Check if the database connection was successful
+if ($conn->connect_error) {
+  die("Connection failed: " . $conn->connect_error);
+}
+
+$shareable_id = isset($_GET['id']) ? $_GET['id'] : '';
+$item_details = null;
+$progress_history = [];
+$latest_progress = "Awaiting Progress";
+
+if (!empty($shareable_id)) {
+    $stmt = $conn->prepare("SELECT id, item_name, item_id, client FROM items WHERE shareable_id = ?");
+    if ($stmt === false) {
+        die("Prepare failed: (" . $conn->errno . ") " . $conn->error);
+    }
+
+    $stmt->bind_param("s", $shareable_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($result->num_rows > 0) {
+        $item_details = $result->fetch_assoc();
+        $item_internal_id = $item_details['id'];
+
+        $stmt_progress = $conn->prepare(
+            "SELECT progress, description, date, time, image_path FROM progress 
+             WHERE item_primary_id = ?
+             ORDER BY date DESC, time DESC"
+        );
+        if ($stmt_progress === false) {
+            die("Prepare failed for progress: (" . $conn->errno . ") " . $conn->error);
+        }
+
+        $stmt_progress->bind_param("i", $item_internal_id);
+        $stmt_progress->execute();
+        $progress_result = $stmt_progress->get_result();
+        
+        while ($row = $progress_result->fetch_assoc()) {
+            $progress_history[] = $row;
+        }
+        $stmt_progress->close();
+
+        if (!empty($progress_history)) {
+            $latest_progress = htmlspecialchars($progress_history[0]['progress']);
+        }
+    }
+    $stmt->close();
+}
+$conn->close();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Us - Legasi Futura Sdn Bhd</title>
+    <title>LFSB - Item and Inventory Tracking</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
-    <link rel="icon" type="image/png" href="img/icon/favicon-96x96.png" sizes="96x96" />
-    <link rel="icon" type="image/svg+xml" href="img/icon/favicon.svg" />
-    <link rel="shortcut icon" href="img/icon/favicon.ico" />
-    <link rel="apple-touch-icon" sizes="180x180" href="img/icon/apple-touch-icon.png" />
-    <link rel="manifest" href="img/icon/site.webmanifest" />
     <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="img/logo_only.png" type="image/png">
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -22,15 +78,102 @@
         #main-header {
             position: fixed !important;
         }
+
+        /* --- Styles for Client Tracking Timeline --- */
+        .tracking-container { max-width: 800px; margin: 20px auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 0 15px rgba(0,0,0,0.1); }
+        .tracking-header { border-bottom: 1px solid #eee; padding-bottom: 20px; margin-bottom: 30px; }
+        .tracking-header h2 { text-align: right; color: #555; font-weight: normal; margin: 0; }
+        .item-info { margin-top: 15px; }
+        .item-info p { margin: 5px 0; font-size: 1.1em; color: #333; }
+        
+        .timeline { position: relative; list-style: none; padding: 0; margin-top: 30px; }
+        
+        .timeline-item { position: relative; margin-bottom: 30px; padding-left: 70px; }
+        .timeline-item:last-child { margin-bottom: 0; }
+
+        .timeline-item::before {
+            content: '';
+            background-color: #ddd;
+            position: absolute;
+            width: 2px;
+            top: 0;
+            left: 19px; /* Aligned to center of the icon */
+            height: calc(100% + 30px); /* Full height of item + bottom margin */
+            z-index: 1;
+        }
+
+        .timeline-item:first-child::before {
+            top: 20px;
+            height: calc(100% + 10px); /* Adjust height to account for new top position */
+        }
+
+        .timeline-item:last-child::before {
+            height: 20px;
+        }
+        
+        .timeline-icon { 
+            position: absolute; 
+            left: 0px; 
+            top: 0; 
+            width: 40px; 
+            height: 40px; 
+            border-radius: 50%; 
+            background: #fff; 
+            border: 3px solid #f2a202; 
+            z-index: 10;
+        }
+
+        .timeline-icon::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-bottom: 4px; 
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-bottom: 8px solid #f2a202;
+        }
+        
+        .timeline-item.delivered .timeline-icon { 
+            background: #28a745; 
+            border-color: #28a745; 
+            color: white; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 1.5em; 
+        }
+        .timeline-item.delivered .timeline-icon:before { content: '✔'; }
+
+        .timeline-item.delivered .timeline-icon::after {
+            display: none;
+        }
+        
+        .timeline-body {
+            position: relative;
+            top: -5px;
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #eee;
+        }
+        
+        .timeline-body .time { font-size: 0.9em; color: #888; margin-bottom: 5px; }
+        .timeline-body h4 { margin: 0 0 5px 0; font-size: 1.1em; }
+        .timeline-body p { margin: 0; color: #666; font-size: 1em; }
+        .not-found { text-align: center; color: #888; font-size: 1.2em; padding: 40px; }
     </style>
 </head>
 <body class="bg-white text-gray-800">
 
-        <header id="main-header" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-black">
+    <header id="main-header" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-black">
         <div class="container mx-auto px-6 py-4">
             <div class="flex items-center justify-between">
                 <a href="index.html" class="flex items-center space-x-2">
-                    <img src="img/logo.webp" alt="Legasi Futura Logo" class="h-10">
+                    <img src="img/logo.png" alt="Legasi Futura Logo" class="h-10">
                 </a>
                 <nav class="hidden lg:flex items-center space-x-6">
                     <a href="index.html" class="text-white/90 uppercase text-sm font-medium tracking-wider transition-colors duration-300 hover:text-white">Home</a>
@@ -103,88 +246,55 @@
         </nav>
     </div>
 
-    
-    <main class="pt-32 pb-20">
-        <div class="container mx-auto px-6">
-            <h1 class="text-4xl md:text-5xl font-bold text-center text-gray-800 mb-16">Contact Us</h1>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-                
-                
-                <div class="flex flex-col space-y-12">
-                    
-                    <div>
-                        <h3 class="text-3xl font-bold text-gray-800 mb-6">Contact Information</h3>
-                        <div class="space-y-4 text-gray-600">
-                            <p class="flex items-start">
-                                <svg class="w-5 h-5 mr-3 text-blue-900 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                                <span>1st Floor, Lot 2161 Block 5, Jalan Saberkas Utama, Jalan Pujut-Lutong, 98000 Miri, Sarawak, Malaysia.</span>
-                            </p>
-                            <p class="flex items-center">
-                                <svg class="w-5 h-5 mr-3 text-blue-900" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
-                                <span>Office: 085-647700 / H/P: +6013-862-6042</span>
-                            </p>
-                            <p class="flex items-center">
-                                <svg class="w-5 h-5 mr-3 text-blue-900" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                                <span>enquiry@legasifutura.com.my</span>
-                            </p>
+    <div id="main-container">
+        <main class="pt-32 pb-20">
+            <div class="tracking-container">
+                <?php if ($item_details): ?>
+                    <div class="tracking-header">
+                        <h2>Hello, <?php echo htmlspecialchars($item_details['client']); ?></h2>
+                        <div class="item-info"> 
+                            <p><strong>Item Name:</strong> <?php echo htmlspecialchars($item_details['item_name']); ?></p>
+                            <p><strong>Item ID:</strong> <?php echo htmlspecialchars($item_details['item_id']); ?></p>
+                            <p><strong>Current Status:</strong> <?php echo htmlspecialchars($latest_progress); ?></p>
                         </div>
-                    </div>
-                    
-                    <div>
-                        <h2 class="text-3xl font-bold text-gray-800 mb-6">Send us a Message</h2>
-                        <form action="https://formsubmit.co/enquiry@legasifutura.com.my" method="POST" class="space-y-6">
-                            <div>
-                                <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                                <input type="text" name="name" id="name" required class="w-full px-4 py-2 bg-gray-100 border-transparent rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                            </div>
-                            <div>
-                                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
-                                <input type="email" name="email" id="email" required class="w-full px-4 py-2 bg-gray-100 border-transparent rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                            </div>
-                            <div>
-                                <label for="subject" class="block text-sm font-medium text-gray-700 mb-1">Subject</label>
-                                <input type="text" name="subject" id="subject" required class="w-full px-4 py-2 bg-gray-100 border-transparent rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                            </div>
-                            <div>
-                                <label for="message" class="block text-sm font-medium text-gray-700 mb-1">Message</label>
-                                <textarea name="message" id="message" rows="6" required class="w-full px-4 py-2 bg-gray-100 border-transparent rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
-                            </div>
-                            <div>
-                                <button type="submit" class="w-full bg-blue-900 text-white font-bold py-3 px-6 rounded-md hover:bg-blue-700 transition-colors duration-300">
-                                    Send Message
-                                </button>
-                            </div>
-                            <input type="hidden" name="_next" value="https://hakimilolw.github.io/WebLFSB/contact-us.html?submitted=true">
-                            <input type="hidden" name="_captcha" value="false">
-                        </form>
-                    </div>
-                </div>
-                
-               
-                <div class="flex flex-col space-y-8">
-                    <div class="rounded-lg overflow-hidden shadow-lg">
-                        <img src="img/office/new-office.webp" alt="Legasi Futura Office" class="w-full h-auto object-cover">
                     </div>
 
-                    <div>
-                         <h2 class="text-3xl font-bold text-gray-800 mb-6">Find Us Here</h2>
-                         <div class="w-full h-96 rounded-lg overflow-hidden shadow-lg">
-                            <iframe
-                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3977.9551737736424!2d114.01313497481578!3d4.419454695554749!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x321f4f0070a2dc0f%3A0xb815e08045f1ae7b!2sLegasi%20Futura%20Sdn.%20Bhd.!5e0!3m2!1sen!2smy!4v1750042046010!5m2!1sen!2smy"
-                                class="w-full h-full border-0"
-                                allowfullscreen=""
-                                loading="lazy"
-                                referrerpolicy="no-referrer-when-downgrade">
-                            </iframe>
-                        </div>
-                    </div>
-                </div>
-                
+                    <ul class="timeline">
+                        <?php if (empty($progress_history)): ?>
+                            <li class="timeline-item">
+                                <div class="timeline-icon"></div>
+                                <div class="timeline-body">
+                                    <h4>Awaiting Progress</h4>
+                                    <p>No tracking updates have been recorded for this item yet.</p>
+                                </div>
+                            </li>
+                        <?php else: ?>
+                            <?php foreach ($progress_history as $index => $progress): ?>
+                                <li class="timeline-item <?php echo (strtolower($progress['progress']) == 'delivered') ? 'delivered' : ''; ?>">
+                                    <div class="timeline-icon"></div>
+                                    <div class="timeline-body">
+                                        <div class="time">
+                                            <?php echo date('d/m/Y', strtotime($progress['date'])) . ' ' . date('g:i a', strtotime($progress['time'])); ?>
+                                        </div>
+                                        <h4><?php echo htmlspecialchars($progress['progress']); ?></h4>
+                                        <p><?php echo htmlspecialchars($progress['description']); ?></p>
+                                        <?php if (!empty($progress['image_path'])): ?>
+                                            <p style="margin-top: 10px;">
+                                                <a href="#" class="text-blue-600 hover:underline see-image-trigger" data-img-src="<?php echo htmlspecialchars($progress['image_path']); ?>">See Image</a>
+                                            </p>
+                                        <?php endif; ?>
+                                    </div>
+                                </li>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </ul>
+                <?php else: ?>
+                    <p class="not-found">Tracking ID not found. Please check the URL and try again.</p>
+                <?php endif; ?>
             </div>
-        </div>
-    </main>
+            </main>
 
-    <footer class="bg-gray-800 text-white py-8">
+        <footer class="bg-gray-800 text-white py-8">
             <div class="container mx-auto px-6">
                 <div class="text-center md:text-left">
                     <div class="mb-6 md:mb-0">
@@ -203,41 +313,40 @@
                 </div>
             </div>
         </footer>
-
-    <div class="text-center text-white text-sm py-6 bg-black">
-        © 2025 Legasi Futura Sdn. Bhd. All rights reserved.
+        <div class="text-center text-white text-sm py-6 bg-black">
+            &copy; 2025 Legasi Futura Sdn. Bhd. All rights reserved.
+        </div>
     </div>
-    
-    <a href="https://wa.me/60138626042" class="float" target="_blank">
+
+    <!-- Image Modal -->
+    <div id="image-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-[100] p-4">
+        <div class="bg-white p-2 rounded-lg shadow-xl max-w-4xl max-h-[90vh] relative">
+            <button id="close-image-modal" class="absolute -top-3 -right-3 bg-gray-700 text-white rounded-full p-2 z-10 hover:bg-black transition-colors duration-200">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <img id="modal-image" src="" class="max-w-full max-h-[85vh]" alt="Progress Image">
+        </div>
+    </div>
+
+
+    <a href="https://wa.me/60138626042" class="float" target="_blank" rel="noopener noreferrer">
         <i class="fa fa-whatsapp my-float"></i>
     </a>
     <a id="back-to-top-btn" href="#" class="hidden fixed bottom-28 right-10 bg-blue-900 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition-all duration-300 z-50">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
     </a>
 
-    <div id="thank-you-modal" class="hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[100] p-4">
-        <div class="bg-white p-8 rounded-lg shadow-xl text-center max-w-sm mx-auto">
-            <h2 class="text-2xl font-bold mb-4 text-gray-800">Thank You!</h2>
-            <p class="text-gray-600 mb-6">Your message has been sent successfully. We will get back to you shortly.</p>
-            <button id="close-modal-btn" class="bg-blue-900 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors duration-300">Close</button>
-        </div>
-    </div>
-
-
     <script>
+        // --- Legasi Futura Template JS ---
         const burgerMenuBtn = document.getElementById('burger-menu');
         const mobileMenu = document.getElementById('mobile-menu');
         const mainHeader = document.getElementById('main-header');
         const backToTopBtn = document.getElementById('back-to-top-btn');
-        const thankYouModal = document.getElementById('thank-you-modal');
-        const closeModalBtn = document.getElementById('close-modal-btn');
 
-        // Mobile Menu Toggle
         burgerMenuBtn.addEventListener('click', () => {
             mobileMenu.classList.toggle('hidden');
         });
         
-        // Scroll Behavior
         let lastScrollY = window.scrollY;
         window.addEventListener('scroll', () => {
             const currentScrollY = window.scrollY;
@@ -246,62 +355,64 @@
             } else {
                 mainHeader.classList.remove('-translate-y-full');
             }
-            
+            if (currentScrollY > 50) {
+                mainHeader.classList.add('bg-black/80');
+                mainHeader.classList.remove('bg-black/30');
+            } else {
+                mainHeader.classList.add('bg-black/30');
+                mainHeader.classList.remove('bg-black/80');
+            }
             lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY; 
-            
-            if (backToTopBtn) {
-                if (window.scrollY > 300) {
-                    backToTopBtn.classList.remove('hidden');
-                } else {
-                    backToTopBtn.classList.add('hidden');
-                }
+            if (window.scrollY > 300) {
+                backToTopBtn.classList.remove('hidden');
+            } else {
+                backToTopBtn.classList.add('hidden');
             }
         });
 
-        // Back to Top button click
         backToTopBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         });
 
-        const mobileMenuToggles = document.querySelectorAll('.mobile-menu-toggle');
-        mobileMenuToggles.forEach(toggle => {
-            toggle.addEventListener('click', () => {
-                const submenu = toggle.nextElementSibling;
-                const icon = toggle.querySelector('svg');
+        // --- Image Modal Logic ---
+        const imageModal = document.getElementById('image-modal');
+        if (imageModal) {
+            const modalImage = document.getElementById('modal-image');
+            const closeImageModalBtn = document.getElementById('close-image-modal');
+            const mainContainer = document.getElementById('main-container');
 
-                submenu.classList.toggle('hidden');
-                icon.classList.toggle('rotate-180');
-            });
-        });
-
-        // Thank You Modal Logic
-        if (thankYouModal && closeModalBtn) {
-            // Show modal if the 'submitted' param is in the URL
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('submitted') === 'true') {
-                thankYouModal.classList.remove('hidden');
-            }
-
-            // Function to close the modal
-            const hideModal = () => {
-                thankYouModal.classList.add('hidden');
+            const hideImageModal = () => {
+                imageModal.classList.add('hidden');
+                modalImage.src = ''; 
             };
 
-            // Close modal when the close button is clicked
-            closeModalBtn.addEventListener('click', hideModal);
+            mainContainer.addEventListener('click', (e) => {
+                if (e.target.classList.contains('see-image-trigger')) {
+                    e.preventDefault();
+                    const imgSrc = e.target.dataset.imgSrc;
+                    if (imgSrc) {
+                        modalImage.src = imgSrc;
+                        imageModal.classList.remove('hidden');
+                    }
+                }
+            });
 
-            // Close modal when clicking on the overlay background
-            thankYouModal.addEventListener('click', (e) => {
-                if (e.target.id === 'thank-you-modal') {
-                    hideModal();
+            closeImageModalBtn.addEventListener('click', hideImageModal);
+
+            imageModal.addEventListener('click', (e) => {
+                if (e.target.id === 'image-modal') {
+                    hideImageModal();
+                }
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === "Escape" && !imageModal.classList.contains('hidden')) {
+                    hideImageModal();
                 }
             });
         }
     </script>
 
 </body>
-</html>
+</ht

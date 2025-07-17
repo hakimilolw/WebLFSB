@@ -1,0 +1,100 @@
+CREATE TABLE items (
+  id int(11) NOT NULL,
+  shareable_id varchar(36) NOT NULL,
+  item_name varchar(255) NOT NULL,
+  item_id varchar(255) NOT NULL,
+  client varchar(255) DEFAULT NULL,
+  eta varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table items
+--
+
+INSERT INTO items (id, shareable_id, item_name, item_id, client, eta) VALUES
+(6, 'e3b1caca-dc2d-4a8c-abd7-456116f49347', 'DBB - Sampling Connection', 'PO-25-00755', 'HHA', '01.08.25'),
+(9, 'ef9b39e9-3c1c-4026-8231-f9d8acf1d593', 'SP Item (Chemical Injection)', 'PO-25-00975', 'HHA', '22.08.25'),
+(10, '0287cd23-f5f8-49d6-bbbe-3076bfb60da0', 'Manual & Globe Valve', 'PO-25-01026', 'HHA', '12.09.25');
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table items
+--
+ALTER TABLE items
+  ADD PRIMARY KEY (id),
+  ADD UNIQUE KEY shareable_id (shareable_id);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table items
+--
+ALTER TABLE items
+  MODIFY id int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+COMMIT;
+
+CREATE TABLE progress (
+  id int(11) NOT NULL,
+  item_primary_id int(11) NOT NULL,
+  progress varchar(255) NOT NULL,
+  description text NOT NULL,
+  date date NOT NULL,
+  time time NOT NULL,
+  image_path varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table progress
+--
+
+INSERT INTO progress (id, item_primary_id, progress, description, date, time, image_path) VALUES
+(26, 6, 'PO Received', '', '2025-06-03', '17:00:00', NULL),
+(27, 6, 'Submission GA Drawing to client', '', '2025-06-06', '17:00:00', NULL),
+(28, 6, 'Drawing approve by client', '', '2025-06-14', '08:00:00', NULL),
+(29, 6, 'Procurement and purchasing of materials', '', '2025-06-04', '17:00:00', NULL),
+(30, 6, 'Kick off meeting', '', '2025-06-06', '14:00:00', NULL),
+(31, 6, 'Fabrication start', '', '2025-06-14', '12:00:00', NULL),
+(32, 6, 'Valve assembly, pre testing', '', '2025-06-20', '08:00:00', NULL),
+(33, 6, 'FAT with TPI', '', '2025-06-24', '08:00:00', NULL),
+(34, 6, 'Painting and coating in progress', '', '2025-06-27', '08:00:00', NULL),
+(36, 6, 'Packing and delivery arrangement', 'Arrived in Kuching, currently customs clearance in progress for duties', '2025-06-30', '20:00:00', NULL),
+(38, 6, 'Arrival at location with customs clearance', 'Arrived at Bintulu\'s testing yard ', '2025-07-10', '14:00:00', 'uploads/6870bdad11c7e-2.jpg'),
+(39, 9, 'PO Received', '', '2025-07-04', '17:00:00', NULL),
+(40, 10, 'PO Received', '', '2025-07-11', '17:00:00', NULL);
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table progress
+--
+ALTER TABLE progress
+  ADD PRIMARY KEY (id),
+  ADD KEY item_primary_id (item_primary_id);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table progress
+--
+ALTER TABLE progress
+  MODIFY id int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table progress
+--
+ALTER TABLE progress
+  ADD CONSTRAINT progress_ibfk_1 FOREIGN KEY (item_primary_id) REFERENCES items (id) ON DELETE CASCADE;
+COMMIT;

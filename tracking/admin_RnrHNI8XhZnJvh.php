@@ -93,19 +93,21 @@ include 'config.php'; // Your database connection
                 <div class="form-group">
                     <label for="editProgressStatus">Progress Status</label>
                     <select id="editProgressStatus" required>
-                         <option value="PO Received">PO Received</option>
-                        <option value="Submission GA Drawing to client">Submission GA Drawing to client</option>
+                        <option value="Purchase Order (PO) received">Purchase Order (PO) received</option>
+                        <option value="Submission GA Drawing to client">Submission General Arrangement Drawing (GAD) to client</option>
+                        <option value="Awaiting drawing approval from client">Awaiting drawing approval from client</option>
                         <option value="Kick off meeting">Kick off meeting</option>
                         <option value="Procurement and purchasing of materials">Procurement and purchasing of materials</option>
                         <option value="Drawing approve by client">Drawing approval by client</option>
                         <option value="Fabrication start">Fabrication in progress</option>
                         <option value="Valve assembly, pre testing">Valve assembly, pre testing</option>
-                        <option value="FAT in Progress">FAT in Progress</option>
-                        <option value="FAT with TPI">FAT with TPI</option>
+                        <option value="Factory Acceptance Test (FAT) with Third Party Inspector (TPI) in progress"> Factory Acceptance Test (FAT) with Third Party Inspector (TPI) in progress</option>
                         <option value="Painting and coating in progress">Painting and coating in progress</option>
                         <option value="Packing and delivery arrangement">Packing and delivery arrangement</option>
+                        <option value="Approval for custom clearance">Approval for custom clearance</option>
                         <option value="Arrival at location with customs clearance">Arrival at location with customs clearance</option>
-                        <option value="SAT in progress">SAT in progress</option>
+                        <option value="Awaiting for Notice of inpesction (NOI) approval">Awaiting for Notice of inpesction (NOI) approval</option>
+                        <option value="Site Acceptance Test (SAT) in progress">Site Acceptance Test (SAT) in progress</option>
                         <option value="Delivery to client's yard">Delivery to client's yard</option>
                         <option value="Delivered">Delivered</option>
                     </select>
@@ -128,7 +130,7 @@ include 'config.php'; // Your database connection
                 <div class="form-group">
                     <label for="addProgressStatus">Progress Status</label>
                     <select id="addProgressStatus" required>
-                         <option value="Purchase Order (PO) received">Purchase Order (PO) received</option>
+                        <option value="Purchase Order (PO) received">Purchase Order (PO) received</option>
                         <option value="Submission GA Drawing to client">Submission General Arrangement Drawing (GAD) to client</option>
                         <option value="Awaiting drawing approval from client">Awaiting drawing approval from client</option>
                         <option value="Kick off meeting">Kick off meeting</option>
@@ -139,7 +141,9 @@ include 'config.php'; // Your database connection
                         <option value="Factory Acceptance Test (FAT) with Third Party Inspector (TPI) in progress"> Factory Acceptance Test (FAT) with Third Party Inspector (TPI) in progress</option>
                         <option value="Painting and coating in progress">Painting and coating in progress</option>
                         <option value="Packing and delivery arrangement">Packing and delivery arrangement</option>
+                        <option value="Approval for custom clearance">Approval for custom clearance</option>
                         <option value="Arrival at location with customs clearance">Arrival at location with customs clearance</option>
+                        <option value="Awaiting for Notice of inpesction (NOI) approval">Awaiting for Notice of inpesction (NOI) approval</option>
                         <option value="Site Acceptance Test (SAT) in progress">Site Acceptance Test (SAT) in progress</option>
                         <option value="Delivery to client's yard">Delivery to client's yard</option>
                         <option value="Delivered">Delivered</option>
